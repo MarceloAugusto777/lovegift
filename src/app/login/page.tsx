@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Heart, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react'
+import { Heart, Eye, EyeOff, Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -64,6 +64,14 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md relative z-10"
       >
+        {/* Back to home */}
+        <button
+          onClick={() => router.push('/')}
+          className="flex items-center gap-2 text-white/30 hover:text-white/60 transition-colors text-sm mb-8"
+        >
+          <ArrowLeft size={16} /> Voltar para o início
+        </button>
+
         {/* Logo */}
         <div className="flex items-center gap-2.5 mb-10 justify-center">
           <motion.div
