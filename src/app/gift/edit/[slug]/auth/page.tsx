@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Heart, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react'
+import { Heart, Eye, EyeOff, Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 
 export default function EditorAuthPage() {
   const params = useParams()
@@ -82,6 +82,11 @@ export default function EditorAuthPage() {
           A senha foi gerada quando você criou sua conta.<br />
           Ela está no seu Dashboard.
         </p>
+
+        <button onClick={() => router.push('/dashboard')}
+          className="mt-6 w-full py-3 bg-white/[0.04] border border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/[0.06] rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all">
+          <ArrowLeft size={16} /> Voltar ao Dashboard
+        </button>
       </motion.div>
     </div>
   )
