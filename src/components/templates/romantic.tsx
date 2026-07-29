@@ -62,6 +62,7 @@ interface RomanticTemplateProps {
     locationName?: string
     musicUrl?: string
     accentColor: string
+    fontFamily?: string
     dayCountStart: string
     senderName?: string
     clientName?: string
@@ -692,6 +693,7 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
   const storySections = JSON.parse(gift.storySections) as StorySection[]
   const timelineEvents = JSON.parse(gift.timelineEvents) as TimelineEvent[]
   const accentColor = gift.accentColor || '#e11d48'
+  const fontFamily = gift.fontFamily || 'Georgia, serif'
 
   useEffect(() => {
     const start = new Date(gift.dayCountStart || gift.specialDate)
@@ -751,6 +753,7 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
 
       <FooterSection clientName={gift.clientName} accentColor={accentColor} />
 
+      <style>{`.font-serif { font-family: '${fontFamily}', serif !important; }`}</style>
       <style jsx global>{`
         html {
           scroll-behavior: smooth;

@@ -68,6 +68,7 @@ interface GiftData {
   storyTitle: string
   storySections: StorySection[]
   timelineEvents: TimelineEvent[]
+  template?: { slug: string; name: string }
 }
 
 type TabId = "info" | "fotos" | "historia" | "timeline" | "citacoes" | "estilo" | "preview"
@@ -206,7 +207,7 @@ export default function GiftEditPage() {
       setMusicUrl(g.musicUrl || "")
       setAccentColor(g.accentColor || "#e11d48")
       setFontFamily(g.fontFamily || "Playfair Display")
-      setTemplateId(g.templateId || "romantic")
+      setTemplateId(g.template?.slug || "romantic")
       setDayCountStart(g.dayCountStart ? g.dayCountStart.split('T')[0] : (g.specialDate ? g.specialDate.split('T')[0] : ""))
 
       try {
@@ -282,12 +283,10 @@ export default function GiftEditPage() {
 
   const markChanged = () => setHasChanges(true)
 
-  const compressImage = async (blob: Blob): Promise<string> => {
+  const compressImage = async (dataUrl: string): Promise<string> => {
     const img = new Image()
-    const url = URL.createObjectURL(blob)
     return new Promise((resolve, reject) => {
       img.onload = () => {
-        URL.revokeObjectURL(url)
         const maxW = 800
         let { width, height } = img
         if (width > maxW) {
@@ -302,7 +301,7 @@ export default function GiftEditPage() {
         resolve(canvas.toDataURL('image/jpeg', 0.7))
       }
       img.onerror = reject
-      img.src = url
+      img.src = dataUrl
     })
   }
 
@@ -319,8 +318,8 @@ export default function GiftEditPage() {
     return null
   }
 
-  const handleCropConfirm = async (croppedBlob: Blob) => {
-    const compressed = await compressImage(croppedBlob)
+  const handleCropConfirm = async (croppedDataUrl: string) => {
+    const compressed = await compressImage(croppedDataUrl)
     const url = await uploadPhoto(compressed)
     if (!url) { setCropImage(null); setCropTarget(null); setCropReplaceCallback(null); return }
     if (cropReplaceCallback) {

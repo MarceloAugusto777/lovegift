@@ -20,6 +20,7 @@ interface TemplateProps {
     locationName?: string
     musicUrl?: string
     accentColor: string
+    fontFamily?: string
     dayCountStart: string
     senderName?: string
     clientName?: string
@@ -44,9 +45,8 @@ interface TimelineEvent {
   photo?: string
 }
 
-const ACCENT = "#e11d48"
-const ACCENT_LIGHT = "#fda4af"
-const ACCENT_DARK = "#9f1239"
+
+let FONT = 'Georgia, serif'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 50 },
@@ -109,7 +109,7 @@ function FloatingHearts() {
             width={h.size}
             height={h.size}
             viewBox="0 0 24 24"
-            fill={ACCENT}
+            fill={'var(--accent)'}
             opacity="0.35"
           >
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -126,7 +126,7 @@ function HeartDivider() {
       <div
         className="h-px w-16"
         style={{
-          background: `linear-gradient(to right, transparent, ${ACCENT}88)`,
+          background: `linear-gradient(to right, transparent, ${'var(--accent)'}88)`,
         }}
       />
       <motion.div
@@ -137,7 +137,7 @@ function HeartDivider() {
           width="18"
           height="18"
           viewBox="0 0 24 24"
-          fill={ACCENT}
+          fill={'var(--accent)'}
           opacity="0.7"
         >
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -146,7 +146,7 @@ function HeartDivider() {
       <div
         className="h-px w-16"
         style={{
-          background: `linear-gradient(to left, transparent, ${ACCENT}88)`,
+          background: `linear-gradient(to left, transparent, ${'var(--accent)'}88)`,
         }}
       />
     </div>
@@ -201,7 +201,7 @@ function HeroSection({
           <div
             className="w-full h-full"
             style={{
-              background: `radial-gradient(ellipse at 50% 30%, ${ACCENT_DARK}, #1a0a12 70%, #0a0507)`,
+              background: `radial-gradient(ellipse at 50% 30%, ${'var(--accent-dark)'}, #1a0a12 70%, #0a0507)`,
             }}
           />
         )}
@@ -252,7 +252,7 @@ function HeroSection({
                 width="90"
                 height="90"
                 viewBox="0 0 24 24"
-                fill={ACCENT}
+                fill={'var(--accent)'}
               >
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
@@ -272,7 +272,7 @@ function HeroSection({
             <motion.div
               className="w-px h-14 mx-auto mb-6"
               style={{
-                background: `linear-gradient(to bottom, transparent, ${ACCENT_LIGHT}, transparent)`,
+                background: `linear-gradient(to bottom, transparent, ${'var(--accent-light)'}, transparent)`,
               }}
               initial={{ scaleY: 0 }}
               animate={{ scaleY: 1 }}
@@ -284,8 +284,8 @@ function HeroSection({
             variants={fadeUp}
             className="font-serif text-5xl md:text-7xl lg:text-8xl text-white font-bold tracking-tight"
             style={{
-              fontFamily: "Georgia, 'Times New Roman', serif",
-              textShadow: `0 0 80px ${ACCENT}44`,
+              fontFamily: FONT,
+              textShadow: `0 0 80px ${'var(--accent)'}44`,
             }}
           >
             {coupleName.split("&").map((name, i) => (
@@ -293,7 +293,7 @@ function HeroSection({
                 {i === 1 && (
                   <motion.span
                     className="block text-3xl md:text-4xl lg:text-5xl my-3 font-light italic"
-                    style={{ color: ACCENT_LIGHT }}
+                    style={{ color: 'var(--accent-light)' }}
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 1.2, duration: 0.8 }}
@@ -320,7 +320,7 @@ function HeroSection({
             <motion.p
               variants={fadeUp}
               className="font-serif text-xl md:text-2xl italic tracking-wide"
-              style={{ color: ACCENT_LIGHT, fontFamily: "Georgia, serif" }}
+              style={{ color: 'var(--accent-light)', fontFamily: FONT }}
             >
               {storyTitle}
             </motion.p>
@@ -329,12 +329,12 @@ function HeroSection({
           <motion.div
             variants={fadeUp}
             className="flex items-center justify-center gap-4"
-            style={{ color: `${ACCENT_LIGHT}cc` }}
+            style={{ color: `${'var(--accent-light)'}cc` }}
           >
-            <div className="h-px w-12" style={{ background: `${ACCENT}66` }} />
+            <div className="h-px w-12" style={{ background: `${'var(--accent)'}66` }} />
             <span
               className="text-sm tracking-[0.3em] uppercase font-light"
-              style={{ fontFamily: "Georgia, serif" }}
+              style={{ fontFamily: FONT }}
             >
               {new Date(specialDate).toLocaleDateString("pt-BR", {
                 day: "numeric",
@@ -342,7 +342,7 @@ function HeroSection({
                 year: "numeric",
               })}
             </span>
-            <div className="h-px w-12" style={{ background: `${ACCENT}66` }} />
+            <div className="h-px w-12" style={{ background: `${'var(--accent)'}66` }} />
           </motion.div>
 
           <motion.div variants={fadeUp} className="pt-8">
@@ -353,7 +353,7 @@ function HeroSection({
             >
               <p
                 className="text-xs tracking-[0.4em] uppercase mb-3"
-                style={{ color: `${ACCENT_LIGHT}99` }}
+                style={{ color: `${'var(--accent-light)'}99` }}
               >
                 Deslize para baixo
               </p>
@@ -361,7 +361,7 @@ function HeroSection({
                 className="w-5 h-5 mx-auto"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke={ACCENT_LIGHT}
+                stroke={'var(--accent-light)'}
                 opacity="0.5"
               >
                 <path
@@ -385,7 +385,7 @@ function MessageSection({ message }: { message: string }) {
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse at 50% 50%, ${ACCENT_DARK}33, #0a0507 70%)`,
+          background: `radial-gradient(ellipse at 50% 50%, ${'var(--accent-dark)'}33, #0a0507 70%)`,
         }}
       />
 
@@ -404,7 +404,7 @@ function MessageSection({ message }: { message: string }) {
           <motion.div variants={fadeUp}>
             <p
               className="font-serif text-4xl md:text-5xl italic"
-              style={{ color: `${ACCENT}88` }}
+              style={{ color: `${'var(--accent)'}88` }}
             >
               &ldquo;
             </p>
@@ -413,7 +413,7 @@ function MessageSection({ message }: { message: string }) {
           <motion.p
             variants={fadeUp}
             className="font-serif text-xl md:text-2xl text-white/80 leading-relaxed italic"
-            style={{ fontFamily: "Georgia, serif" }}
+            style={{ fontFamily: FONT }}
           >
             {message}
           </motion.p>
@@ -421,7 +421,7 @@ function MessageSection({ message }: { message: string }) {
           <motion.div variants={fadeUp}>
             <p
               className="font-serif text-4xl md:text-5xl italic"
-              style={{ color: `${ACCENT}88` }}
+              style={{ color: `${'var(--accent)'}88` }}
             >
               &rdquo;
             </p>
@@ -451,14 +451,14 @@ function PhotosSection({ photos }: { photos: string[] }) {
           <motion.div variants={fadeUp} className="text-center mb-12">
             <h2
               className="font-serif text-3xl md:text-4xl text-white/90"
-              style={{ fontFamily: "Georgia, serif" }}
+              style={{ fontFamily: FONT }}
             >
               Nossos Momentos
             </h2>
             <div
               className="w-24 h-px mx-auto mt-4"
               style={{
-                background: `linear-gradient(to right, transparent, ${ACCENT}, transparent)`,
+                background: `linear-gradient(to right, transparent, ${'var(--accent)'}, transparent)`,
               }}
             />
           </motion.div>
@@ -477,7 +477,7 @@ function PhotosSection({ photos }: { photos: string[] }) {
                 <div className="relative group overflow-hidden rounded-2xl">
                   <div
                     className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-40 blur-xl transition-opacity duration-700"
-                    style={{ background: ACCENT }}
+                    style={{ background: 'var(--accent)' }}
                   />
                   <img
                     src={photo}
@@ -487,7 +487,7 @@ function PhotosSection({ photos }: { photos: string[] }) {
                   <div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
                     style={{
-                      background: `linear-gradient(to top, ${ACCENT_DARK}88, transparent 50%)`,
+                      background: `linear-gradient(to top, ${'var(--accent-dark)'}88, transparent 50%)`,
                     }}
                   />
                 </div>
@@ -515,8 +515,8 @@ function LoveStorySection({
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse at 30% 20%, ${ACCENT_DARK}22, transparent 50%),
-                         radial-gradient(ellipse at 70% 80%, ${ACCENT_DARK}15, transparent 50%),
+            background: `radial-gradient(ellipse at 30% 20%, ${'var(--accent-dark)'}22, transparent 50%),
+                         radial-gradient(ellipse at 70% 80%, ${'var(--accent-dark)'}15, transparent 50%),
                          #0a0507`,
           }}
         />
@@ -533,14 +533,14 @@ function LoveStorySection({
           <motion.div variants={fadeUp} className="text-center mb-16">
             <h2
               className="font-serif text-3xl md:text-4xl text-white/90"
-              style={{ fontFamily: "Georgia, serif" }}
+              style={{ fontFamily: FONT }}
             >
               {title || "Nossa História"}
             </h2>
             <div
               className="w-24 h-px mx-auto mt-4"
               style={{
-                background: `linear-gradient(to right, transparent, ${ACCENT}, transparent)`,
+                background: `linear-gradient(to right, transparent, ${'var(--accent)'}, transparent)`,
               }}
             />
           </motion.div>
@@ -569,25 +569,25 @@ function LoveStorySection({
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
-                      fill={ACCENT}
+                      fill={'var(--accent)'}
                       opacity="0.7"
                     >
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
                     <h3
                       className="font-serif text-2xl md:text-3xl"
-                      style={{ color: ACCENT_LIGHT, fontFamily: "Georgia, serif" }}
+                      style={{ color: 'var(--accent-light)', fontFamily: FONT }}
                     >
                       {section.title}
                     </h3>
                   </div>
                   <div
                     className="w-12 h-0.5"
-                    style={{ background: `${ACCENT}44` }}
+                    style={{ background: `${'var(--accent)'}44` }}
                   />
                   <p
                     className="font-serif text-lg text-white/65 leading-relaxed"
-                    style={{ fontFamily: "Georgia, serif" }}
+                    style={{ fontFamily: FONT }}
                   >
                     {section.text}
                   </p>
@@ -619,14 +619,14 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
           <motion.div variants={fadeUp} className="text-center mb-16">
             <h2
               className="font-serif text-3xl md:text-4xl text-white/90"
-              style={{ fontFamily: "Georgia, serif" }}
+              style={{ fontFamily: FONT }}
             >
               Marcos do Nosso Amor
             </h2>
             <div
               className="w-24 h-px mx-auto mt-4"
               style={{
-                background: `linear-gradient(to right, transparent, ${ACCENT}, transparent)`,
+                background: `linear-gradient(to right, transparent, ${'var(--accent)'}, transparent)`,
               }}
             />
           </motion.div>
@@ -635,7 +635,7 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
             <div
               className="absolute left-1/2 transform -translate-x-1/2 w-px h-full hidden md:block"
               style={{
-                background: `linear-gradient(to bottom, transparent, ${ACCENT}55, transparent)`,
+                background: `linear-gradient(to bottom, transparent, ${'var(--accent)'}55, transparent)`,
               }}
             />
 
@@ -656,9 +656,9 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
                   <motion.div
                     className="relative z-10 w-5 h-5 rounded-full border-2 md:mx-0 mx-auto mb-4 md:mb-0"
                     style={{
-                      borderColor: ACCENT,
-                      background: `${ACCENT}33`,
-                      boxShadow: `0 0 20px ${ACCENT}44`,
+                      borderColor: 'var(--accent)',
+                      background: `${'var(--accent)'}33`,
+                      boxShadow: `0 0 20px ${'var(--accent)'}44`,
                     }}
                     whileInView={{ scale: [0, 1.3, 1] }}
                     viewport={{ once: true }}
@@ -673,11 +673,11 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
                     <motion.div
                       className="rounded-2xl p-6 border transition-colors duration-500"
                       style={{
-                        background: `linear-gradient(135deg, ${ACCENT}0a, ${ACCENT}05)`,
-                        borderColor: `${ACCENT}18`,
+                        background: `linear-gradient(135deg, ${'var(--accent)'}0a, ${'var(--accent)'}05)`,
+                        borderColor: `${'var(--accent)'}18`,
                       }}
                       whileHover={{
-                        borderColor: `${ACCENT}44`,
+                        borderColor: `${'var(--accent)'}44`,
                         y: -4,
                       }}
                     >
@@ -690,7 +690,7 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
                       )}
                       <div
                         className="text-sm font-mono tracking-wider mb-2"
-                        style={{ color: ACCENT_LIGHT }}
+                        style={{ color: 'var(--accent-light)' }}
                       >
                         {new Date(event.date).toLocaleDateString("pt-BR", {
                           day: "numeric",
@@ -700,13 +700,13 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
                       </div>
                       <h3
                         className="font-serif text-xl text-white mb-2"
-                        style={{ fontFamily: "Georgia, serif" }}
+                        style={{ fontFamily: FONT }}
                       >
                         {event.title}
                       </h3>
                       <p
                         className="text-white/55 text-sm leading-relaxed"
-                        style={{ fontFamily: "Georgia, serif" }}
+                        style={{ fontFamily: FONT }}
                       >
                         {event.description}
                       </p>
@@ -773,7 +773,7 @@ function DayCounterSection({
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse at 50% 50%, ${ACCENT_DARK}22, #0a0507 70%)`,
+          background: `radial-gradient(ellipse at 50% 50%, ${'var(--accent-dark)'}22, #0a0507 70%)`,
         }}
       />
 
@@ -789,9 +789,9 @@ function DayCounterSection({
             <motion.div
               className="text-8xl md:text-[10rem] font-bold font-mono tabular-nums leading-none"
               style={{
-                color: ACCENT,
-                textShadow: `0 0 60px ${ACCENT}44, 0 0 120px ${ACCENT}22`,
-                fontFamily: "'Georgia', serif",
+                color: 'var(--accent)',
+                textShadow: `0 0 60px ${'var(--accent)'}44, 0 0 120px ${'var(--accent)'}22`,
+                fontFamily: FONT,
               }}
             >
               {count}
@@ -805,7 +805,7 @@ function DayCounterSection({
             <div
               className="w-40 h-px mx-auto"
               style={{
-                background: `linear-gradient(to right, transparent, ${ACCENT}, transparent)`,
+                background: `linear-gradient(to right, transparent, ${'var(--accent)'}, transparent)`,
               }}
             />
           </motion.div>
@@ -813,7 +813,7 @@ function DayCounterSection({
           <motion.p
             variants={fadeUp}
             className="font-serif text-xl text-white/50 italic max-w-xl mx-auto"
-            style={{ fontFamily: "Georgia, serif" }}
+            style={{ fontFamily: FONT }}
           >
             Cada dia ao seu lado é uma bênção que agradeço ao universo
           </motion.p>
@@ -822,8 +822,8 @@ function DayCounterSection({
             <div
               className="rounded-2xl p-5 border"
               style={{
-                background: `${ACCENT}0a`,
-                borderColor: `${ACCENT}18`,
+                background: `${'var(--accent)'}0a`,
+                borderColor: `${'var(--accent)'}18`,
               }}
             >
               <p className="text-white/40 text-xs tracking-wider uppercase mb-1">
@@ -831,7 +831,7 @@ function DayCounterSection({
               </p>
               <p
                 className="text-white/80 text-sm"
-                style={{ fontFamily: "Georgia, serif" }}
+                style={{ fontFamily: FONT }}
               >
                 {new Date(specialDate).toLocaleDateString("pt-BR", {
                   day: "2-digit",
@@ -842,8 +842,8 @@ function DayCounterSection({
             <div
               className="rounded-2xl p-5 border"
               style={{
-                background: `${ACCENT}0a`,
-                borderColor: `${ACCENT}18`,
+                background: `${'var(--accent)'}0a`,
+                borderColor: `${'var(--accent)'}18`,
               }}
             >
               <p className="text-white/40 text-xs tracking-wider uppercase mb-1">
@@ -851,7 +851,7 @@ function DayCounterSection({
               </p>
               <p
                 className="text-2xl font-light"
-                style={{ color: ACCENT_LIGHT, fontFamily: "Georgia, serif" }}
+                style={{ color: 'var(--accent-light)', fontFamily: FONT }}
               >
                 {daysCount}
               </p>
@@ -891,7 +891,7 @@ function LocationSection({
               height="48"
               viewBox="0 0 24 24"
               fill="none"
-              stroke={ACCENT}
+              stroke={'var(--accent)'}
               strokeWidth="1.5"
               className="mx-auto"
             >
@@ -911,14 +911,14 @@ function LocationSection({
           <motion.div variants={fadeUp} className="space-y-4">
             <h2
               className="font-serif text-3xl md:text-4xl text-white/90"
-              style={{ fontFamily: "Georgia, serif" }}
+              style={{ fontFamily: FONT }}
             >
               Nosso Lugar Especial
             </h2>
             <div
               className="w-24 h-px mx-auto"
               style={{
-                background: `linear-gradient(to right, transparent, ${ACCENT}, transparent)`,
+                background: `linear-gradient(to right, transparent, ${'var(--accent)'}, transparent)`,
               }}
             />
           </motion.div>
@@ -927,7 +927,7 @@ function LocationSection({
             <motion.p
               variants={fadeUp}
               className="font-serif text-xl text-white/60 italic"
-              style={{ fontFamily: "Georgia, serif" }}
+              style={{ fontFamily: FONT }}
             >
               {locationName}
             </motion.p>
@@ -941,13 +941,13 @@ function LocationSection({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 font-serif text-lg transition-all duration-500 hover:scale-105"
               style={{
-                borderColor: ACCENT,
-                color: ACCENT_LIGHT,
-                fontFamily: "Georgia, serif",
+                borderColor: 'var(--accent)',
+                color: 'var(--accent-light)',
+                fontFamily: FONT,
               }}
               whileHover={{
-                boxShadow: `0 0 40px ${ACCENT}44`,
-                borderColor: ACCENT_LIGHT,
+                boxShadow: `0 0 40px ${'var(--accent)'}44`,
+                borderColor: 'var(--accent-light)',
               }}
             >
               <svg
@@ -984,7 +984,7 @@ function FooterSection({ clientName }: { clientName?: string }) {
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse at 50% 80%, ${ACCENT_DARK}22, #0a0507)`,
+          background: `radial-gradient(ellipse at 50% 80%, ${'var(--accent-dark)'}22, #0a0507)`,
         }}
       />
 
@@ -1001,7 +1001,7 @@ function FooterSection({ clientName }: { clientName?: string }) {
               animate={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <svg width="64" height="64" viewBox="0 0 24 24" fill={ACCENT}>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill={'var(--accent)'}>
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
             </motion.div>
@@ -1010,14 +1010,14 @@ function FooterSection({ clientName }: { clientName?: string }) {
           <motion.div variants={fadeUp} className="space-y-5">
             <p
               className="font-serif text-xl text-white/60 italic"
-              style={{ fontFamily: "Georgia, serif" }}
+              style={{ fontFamily: FONT }}
             >
               Feito com todo amor do mundo
             </p>
             {clientName && (
               <p
                 className="font-serif text-lg"
-                style={{ color: ACCENT_LIGHT, fontFamily: "Georgia, serif" }}
+                style={{ color: 'var(--accent-light)', fontFamily: FONT }}
               >
                 Com amor, {clientName}
               </p>
@@ -1028,7 +1028,7 @@ function FooterSection({ clientName }: { clientName?: string }) {
             <div
               className="w-32 h-px mx-auto"
               style={{
-                background: `linear-gradient(to right, transparent, ${ACCENT}, transparent)`,
+                background: `linear-gradient(to right, transparent, ${'var(--accent)'}, transparent)`,
               }}
             />
           </motion.div>
@@ -1102,13 +1102,18 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
     }
   }, [gift.timelineEvents])
 
+  const accentColor = gift.accentColor || '#e11d48'
+  FONT = gift.fontFamily || 'Georgia, serif'
+
   return (
     <div
       className="min-h-screen text-white"
       style={{
+        '--accent': accentColor,
+        '--accent-dark': accentColor,
         background:
           "linear-gradient(to bottom, #0a0507, #0f0609 30%, #0a0507 70%, #0a0507)",
-      }}
+      } as React.CSSProperties}
     >
       <FloatingHearts />
 
@@ -1169,6 +1174,7 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
 
       <FooterSection clientName={gift.clientName} />
 
+      <style>{`.font-serif { font-family: '${FONT}', serif !important; }`}</style>
       <style jsx global>{`
         html {
           scroll-behavior: smooth;

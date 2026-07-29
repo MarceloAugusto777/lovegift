@@ -16,6 +16,7 @@ interface TemplateProps {
     locationName?: string
     musicUrl?: string
     accentColor: string
+    fontFamily?: string
     dayCountStart: string
     senderName?: string
     clientName?: string
@@ -191,7 +192,7 @@ function HeroSection({ coupleName, specialDate, dayCountStart }: { coupleName: s
 
           <h1
             className="text-5xl md:text-8xl lg:text-9xl font-extralight tracking-tight text-gray-800 mb-2 leading-none"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            style={{ fontFamily: 'var(--font)' }}
           >
             {coupleName}
           </h1>
@@ -259,7 +260,7 @@ function MessageSection({ message }: { message: string }) {
             </div>
             <p
               className="text-xl md:text-2xl text-gray-600 leading-relaxed font-light italic relative z-10"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ fontFamily: 'var(--font)' }}
             >
               {message}
             </p>
@@ -346,7 +347,7 @@ function StoryTimeline({ sections, title }: { sections: StorySection[]; title?: 
           </p>
           <h2
             className="text-3xl md:text-4xl font-extralight text-gray-700"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            style={{ fontFamily: 'var(--font)' }}
           >
             {title || 'The Story of Us'}
           </h2>
@@ -372,7 +373,7 @@ function StoryTimeline({ sections, title }: { sections: StorySection[]; title?: 
                   <PhotoDisplay photos={section.photos || (section.image ? [section.image] : [])} display={section.photoDisplay || 'single'} aspectRatio="16/9" />
                   <h3
                     className="text-lg text-gray-800 font-medium mb-2"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                    style={{ fontFamily: 'var(--font)' }}
                   >
                     {section.title}
                   </h3>
@@ -438,7 +439,7 @@ function EventsTimeline({ events }: { events: TimelineEvent[] }) {
                   )}
                   <h3
                     className="text-gray-800 font-medium mb-1"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                    style={{ fontFamily: 'var(--font)' }}
                   >
                     {event.title}
                   </h3>
@@ -493,7 +494,7 @@ function DayCounter({ dayCountStart }: { dayCountStart: string }) {
               >
                 <span
                   className="text-4xl md:text-5xl font-extralight text-gray-700"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  style={{ fontFamily: 'var(--font)' }}
                 >
                   {digit}
                 </span>
@@ -589,7 +590,7 @@ function Footer({ clientName }: { clientName?: string }) {
 
         <p
           className="text-2xl md:text-3xl font-extralight text-gray-700 mb-4"
-          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+          style={{ fontFamily: 'var(--font)' }}
         >
           With all my love
         </p>
@@ -644,11 +645,12 @@ export default function WeddingTemplate({ gift }: TemplateProps) {
   const timelineEvents = useMemo(() => parseJsonSafe<TimelineEvent[]>(gift.timelineEvents, []), [gift.timelineEvents])
 
   const accentColor = gift.accentColor || '#9333ea'
+  const fontFamily = gift.fontFamily || "'Playfair Display', Georgia, serif"
 
   return (
     <div
       className="min-h-screen bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 overflow-x-hidden"
-      style={{ '--accent': accentColor } as React.CSSProperties}
+      style={{ '--accent': accentColor, '--font': fontFamily } as React.CSSProperties}
     >
       <Particles />
       <ScrollProgress />
@@ -709,6 +711,8 @@ export default function WeddingTemplate({ gift }: TemplateProps) {
       <Footer clientName={gift.clientName} />
 
       <MusicPlayer musicUrl={gift.musicUrl} />
+
+      <style>{`.font-serif { font-family: '${fontFamily}', serif !important; }`}</style>
     </div>
   )
 }

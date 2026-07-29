@@ -25,6 +25,7 @@ interface TemplateProps {
     locationName?: string
     musicUrl?: string
     accentColor: string
+    fontFamily?: string
     dayCountStart: string
     senderName?: string
     clientName?: string
@@ -163,9 +164,10 @@ export default function GenericTemplate({ gift }: TemplateProps) {
   })
 
   const color = gift.accentColor
+  const fontFamily = gift.fontFamily || 'serif'
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: "#0a0a0a" }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: "#0a0a0a", fontFamily }}>
       <div
         className="fixed inset-0 pointer-events-none opacity-30"
         style={{

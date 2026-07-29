@@ -5,7 +5,7 @@ import Cropper, { Area } from 'react-easy-crop'
 
 interface ImageCropperProps {
   image: string
-  onCrop: (croppedBlob: Blob) => void
+  onCrop: (dataUrl: string) => void
   onCancel: () => void
   aspect?: number
 }
@@ -19,28 +19,24 @@ export default function ImageCropper({ image, onCrop, onCancel, aspect = 4 / 3 }
     setCroppedAreaPixels(croppedPixels)
   }, [])
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!croppedAreaPixels) return
     const canvas = document.createElement('canvas')
-    const imageObj = new Image()
-    imageObj.crossOrigin = 'anonymous'
-    imageObj.src = image
-    await new Promise((resolve) => { imageObj.onload = resolve })
-
-    canvas.width = croppedAreaPixels.width
-    canvas.height = croppedAreaPixels.height
-    const ctx = canvas.getContext('2d')!
-    ctx.drawImage(
-      imageObj,
-      croppedAreaPixels.x, croppedAreaPixels.y,
-      croppedAreaPixels.width, croppedAreaPixels.height,
-      0, 0,
-      croppedAreaPixels.width, croppedAreaPixels.height
-    )
-
-    canvas.toBlob((blob) => {
-      if (blob) onCrop(blob)
-    }, 'image/jpeg', 0.85)
+    const img = new Image()
+    img.src = image
+    img.onload = () => {
+      canvas.width = croppedAreaPixels.width
+      canvas.height = croppedAreaPixels.height
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(
+        img,
+        croppedAreaPixels.x, croppedAreaPixels.y,
+        croppedAreaPixels.width, croppedAreaPixels.height,
+        0, 0,
+        croppedAreaPixels.width, croppedAreaPixels.height
+      )
+      onCrop(canvas.toDataURL('image/jpeg', 0.85))
+    }
   }
 
   return (

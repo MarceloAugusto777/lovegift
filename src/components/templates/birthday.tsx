@@ -62,6 +62,7 @@ interface BirthdayTemplateProps {
     locationName?: string
     musicUrl?: string
     accentColor: string
+    fontFamily?: string
     dayCountStart: string
     senderName?: string
     clientName?: string
@@ -753,6 +754,7 @@ export default function BirthdayTemplate({ gift }: BirthdayTemplateProps) {
   const storySections = JSON.parse(gift.storySections) as StorySection[]
   const timelineEvents = JSON.parse(gift.timelineEvents) as TimelineEvent[]
   const accentColor = gift.accentColor || '#eab308'
+  const fontFamily = gift.fontFamily || 'Georgia, serif'
 
   useEffect(() => {
     const start = new Date(gift.dayCountStart || gift.specialDate)
@@ -816,6 +818,7 @@ export default function BirthdayTemplate({ gift }: BirthdayTemplateProps) {
 
       <FooterSection clientName={gift.clientName} accentColor={accentColor} />
 
+      <style>{`.font-serif { font-family: '${fontFamily}', serif !important; }`}</style>
       <style jsx global>{`
         html {
           scroll-behavior: smooth;
