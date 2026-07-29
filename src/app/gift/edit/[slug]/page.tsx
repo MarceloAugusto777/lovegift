@@ -156,7 +156,6 @@ export default function GiftEditPage() {
 
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | null>(null)
-  const [cropReplaceCallback, setCropReplaceCallback] = useState<((url: string) => void) | null>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -287,7 +286,7 @@ export default function GiftEditPage() {
     const img = new Image()
     return new Promise((resolve, reject) => {
       img.onload = () => {
-        const maxW = 800
+        const maxW = 1200
         let { width, height } = img
         if (width > maxW) {
           height = height * (maxW / width)
@@ -298,7 +297,7 @@ export default function GiftEditPage() {
         canvas.height = height
         const ctx = canvas.getContext('2d')!
         ctx.drawImage(img, 0, 0, width, height)
-        resolve(canvas.toDataURL('image/jpeg', 0.7))
+        resolve(canvas.toDataURL('image/jpeg', 0.88))
       }
       img.onerror = reject
       img.src = dataUrl
@@ -321,10 +320,8 @@ export default function GiftEditPage() {
   const handleCropConfirm = async (croppedDataUrl: string) => {
     const compressed = await compressImage(croppedDataUrl)
     const url = await uploadPhoto(compressed)
-    if (!url) { setCropImage(null); setCropTarget(null); setCropReplaceCallback(null); return }
-    if (cropReplaceCallback) {
-      cropReplaceCallback(url)
-    } else if (cropTarget?.type === 'gallery') {
+    if (!url) { setCropImage(null); setCropTarget(null); return }
+    if (cropTarget?.type === 'gallery') {
       setPhotos((prev) => [...prev, url])
     } else if (cropTarget?.type === 'story') {
       const section = storySections[cropTarget.index]
@@ -337,13 +334,11 @@ export default function GiftEditPage() {
     markChanged()
     setCropImage(null)
     setCropTarget(null)
-    setCropReplaceCallback(null)
   }
 
   const handleCropCancel = () => {
     setCropImage(null)
     setCropTarget(null)
-    setCropReplaceCallback(null)
   }
 
   if (!isAuthenticated) {
@@ -713,13 +708,7 @@ export default function GiftEditPage() {
               <img
                 src={photo}
                 alt={`Foto ${index + 1}`}
-                onClick={() => {
-                  setCropImage(photo)
-                  setCropReplaceCallback((newUrl: string) => {
-                    setPhotos((prev) => prev.map((p, i) => (i === index ? newUrl : p)))
-                  })
-                }}
-                style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "pointer" }}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
               <button
                 onClick={() => removePhoto(index)}
@@ -866,17 +855,7 @@ export default function GiftEditPage() {
                       <img
                         src={photoUrl}
                         alt={`Foto ${photoIdx + 1}`}
-                        onClick={() => {
-                          setCropImage(photoUrl)
-                          setCropReplaceCallback((newUrl: string) => {
-                            const section = storySections[index]
-                            const currentPhotos = section.photos || (section.photo ? [section.photo] : [])
-                            const newPhotos = currentPhotos.map((p, i) => (i === photoIdx ? newUrl : p))
-                            updateStorySection(index, "photos", newPhotos)
-                            updateStorySection(index, "photo", newPhotos[0])
-                          })
-                        }}
-                        style={{ width: "120px", height: "80px", objectFit: "cover", borderRadius: "8px", cursor: "pointer" }}
+                        style={{ width: "120px", height: "80px", objectFit: "cover", borderRadius: "8px" }}
                       />
                       <button
                         onClick={() => removeStoryPhoto(index, photoIdx)}
@@ -1100,13 +1079,7 @@ export default function GiftEditPage() {
                 <img
                   src={event.photo}
                   alt={event.title}
-                  onClick={() => {
-                    setCropImage(event.photo)
-                    setCropReplaceCallback((newUrl: string) => {
-                      updateTimelineEvent(index, "photo", newUrl)
-                    })
-                  }}
-                  style={{ width: "200px", height: "130px", objectFit: "cover", borderRadius: "10px", cursor: "pointer" }}
+                  style={{ width: "200px", height: "130px", objectFit: "cover", borderRadius: "10px" }}
                 />
                 <button
                   onClick={() => updateTimelineEvent(index, "photo", "")}

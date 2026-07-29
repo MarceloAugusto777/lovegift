@@ -45,7 +45,7 @@ export default function ImageCropper({ image, onCrop, onCancel, aspect = 4 / 3 }
         0, 0,
         croppedAreaPixels.width, croppedAreaPixels.height
       )
-      onCrop(canvas.toDataURL('image/jpeg', 0.85))
+      onCrop(canvas.toDataURL('image/jpeg', 0.92))
     }
     img.src = image
   }
