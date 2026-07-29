@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Cropper, { Area } from 'react-easy-crop'
 
 interface ImageCropperProps {
@@ -15,6 +15,17 @@ export default function ImageCropper({ image, onCrop, onCancel, aspect = 4 / 3 }
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
 
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => {
+      const imgRatio = img.naturalWidth / img.naturalHeight
+      if (imgRatio < aspect) {
+        setZoom(aspect / imgRatio)
+      }
+    }
+    img.src = image
+  }, [image, aspect])
+
   const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels)
   }, [])
@@ -23,7 +34,6 @@ export default function ImageCropper({ image, onCrop, onCancel, aspect = 4 / 3 }
     if (!croppedAreaPixels) return
     const canvas = document.createElement('canvas')
     const img = new Image()
-    img.src = image
     img.onload = () => {
       canvas.width = croppedAreaPixels.width
       canvas.height = croppedAreaPixels.height
@@ -37,6 +47,7 @@ export default function ImageCropper({ image, onCrop, onCancel, aspect = 4 / 3 }
       )
       onCrop(canvas.toDataURL('image/jpeg', 0.85))
     }
+    img.src = image
   }
 
   return (
