@@ -38,3 +38,18 @@ export function formatDate(date: Date): string {
     year: 'numeric'
   }).format(date)
 }
+
+export function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('T')[0].split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+
+export function formatLocalDate(dateStr: string): string {
+  if (!dateStr) return ''
+  const [y, m, d] = dateStr.split('T')[0].split('-').map(Number)
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(new Date(y, m - 1, d))
+}

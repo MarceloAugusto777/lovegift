@@ -6,6 +6,7 @@ import {
   Heart,
   Calendar,
   Clock,
+
   MapPin,
   Sparkles,
   Music,
@@ -13,6 +14,7 @@ import {
   ChevronDown,
 } from "lucide-react"
 import PhotoDisplay from "@/components/photo-display"
+import { formatLocalDate, parseLocalDate } from "@/lib/utils"
 
 interface TemplateProps {
   gift: {
@@ -154,14 +156,10 @@ export default function GenericTemplate({ gift }: TemplateProps) {
   const timelineEvents = parseTimelineEvents(gift.timelineEvents)
 
   const daysTogether = Math.floor(
-    (Date.now() - new Date(gift.dayCountStart).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - parseLocalDate(gift.dayCountStart).getTime()) / (1000 * 60 * 60 * 24)
   )
 
-  const formattedDate = new Date(gift.specialDate).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  })
+  const formattedDate = formatLocalDate(gift.specialDate)
 
   const color = gift.accentColor
   const fontFamily = gift.fontFamily || 'serif'

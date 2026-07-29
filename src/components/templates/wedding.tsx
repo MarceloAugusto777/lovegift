@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { Heart, Calendar, MapPin, Music, Clock, Sparkles, ChevronDown, BookOpen, Film } from 'lucide-react'
+import { formatLocalDate, parseLocalDate } from '@/lib/utils'
 import PhotoDisplay from '@/components/photo-display'
 
 interface TemplateProps {
@@ -149,19 +150,11 @@ function HeroSection({ coupleName, specialDate, dayCountStart }: { coupleName: s
   const y = useTransform(scrollY, [0, 600], [0, 80])
 
   const daysTogether = Math.floor(
-    (Date.now() - new Date(dayCountStart).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - parseLocalDate(dayCountStart).getTime()) / (1000 * 60 * 60 * 24)
   )
 
   const formattedDate = useMemo(() => {
-    try {
-      return new Date(specialDate).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    } catch {
-      return specialDate
-    }
+    return formatLocalDate(specialDate)
   }, [specialDate])
 
   return (

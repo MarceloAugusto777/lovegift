@@ -8,6 +8,7 @@ import {
   useTransform,
 } from "framer-motion"
 import PhotoDisplay from "@/components/photo-display"
+import { formatLocalDate, parseLocalDate } from "@/lib/utils"
 
 interface TemplateProps {
   gift: {
@@ -336,11 +337,7 @@ function HeroSection({
               className="text-sm tracking-[0.3em] uppercase font-light"
               style={{ fontFamily: FONT }}
             >
-              {new Date(specialDate).toLocaleDateString("pt-BR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+              {formatLocalDate(specialDate)}
             </span>
             <div className="h-px w-12" style={{ background: `${'var(--accent)'}66` }} />
           </motion.div>
@@ -692,11 +689,7 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
                         className="text-sm font-mono tracking-wider mb-2"
                         style={{ color: 'var(--accent-light)' }}
                       >
-                        {new Date(event.date).toLocaleDateString("pt-BR", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
+                        {formatLocalDate(event.date)}
                       </div>
                       <h3
                         className="font-serif text-xl text-white mb-2"
@@ -735,7 +728,7 @@ function DayCounterSection({
   const hasAnimated = useRef(false)
 
   useEffect(() => {
-    const start = new Date(dayCountStart || specialDate)
+    const start = parseLocalDate(dayCountStart || specialDate)
     const now = new Date()
     const diff = Math.floor(
       (now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
@@ -833,10 +826,7 @@ function DayCounterSection({
                 className="text-white/80 text-sm"
                 style={{ fontFamily: FONT }}
               >
-                {new Date(specialDate).toLocaleDateString("pt-BR", {
-                  day: "2-digit",
-                  month: "long",
-                })}
+                {formatLocalDate(specialDate)}
               </p>
             </div>
             <div

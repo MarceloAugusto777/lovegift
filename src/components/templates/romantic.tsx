@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import PhotoDisplay from '@/components/photo-display'
+import { formatLocalDate, parseLocalDate } from '@/lib/utils'
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 60 },
@@ -194,11 +195,7 @@ function HeroSection({ gift, daysCount }: { gift: RomanticTemplateProps['gift'];
           <motion.div variants={fadeUp} className="flex items-center justify-center gap-4 text-amber-300/80">
             <div className="h-px w-12 bg-amber-400/40" />
             <span className="text-sm tracking-[0.3em] uppercase font-light">
-              {new Date(gift.specialDate).toLocaleDateString('pt-BR', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
+              {formatLocalDate(gift.specialDate)}
             </span>
             <div className="h-px w-12 bg-amber-400/40" />
           </motion.div>
@@ -400,11 +397,7 @@ function TimelineSection({ events, accentColor }: { events: TimelineEvent[]; acc
                         className="text-sm font-mono tracking-wider mb-2"
                         style={{ color: accentColor }}
                       >
-                        {new Date(event.date).toLocaleDateString('pt-BR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                        {formatLocalDate(event.date)}
                       </div>
                       <h3 className="font-serif text-xl text-white mb-2">{event.title}</h3>
                       <p className="text-white/60 text-sm leading-relaxed">{event.description}</p>
@@ -696,7 +689,7 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
   const fontFamily = gift.fontFamily || 'Georgia, serif'
 
   useEffect(() => {
-    const start = new Date(gift.dayCountStart || gift.specialDate)
+    const start = parseLocalDate(gift.dayCountStart || gift.specialDate)
     const now = new Date()
     const diff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
     setDaysCount(diff)

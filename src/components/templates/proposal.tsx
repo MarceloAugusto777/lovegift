@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import PhotoDisplay from '@/components/photo-display'
+import { formatLocalDate, parseLocalDate } from '@/lib/utils'
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 80 },
@@ -172,11 +173,7 @@ function HeroSection({ gift, daysCount }: { gift: ProposalTemplateProps['gift'];
               animate={{ opacity: 1 }}
               transition={{ delay: 1.5, duration: 1 }}
             >
-              {new Date(gift.specialDate).toLocaleDateString('pt-BR', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
+              {formatLocalDate(gift.specialDate)}
             </motion.span>
             <div className="h-px flex-1 max-w-24 bg-gradient-to-r from-transparent via-rose-400 to-transparent" />
           </motion.div>
@@ -508,11 +505,7 @@ function TimelineSection({ events, accentColor }: { events: TimelineEvent[]; acc
                         className="text-xs font-mono tracking-wider mb-3"
                         style={{ color: accentColor }}
                       >
-                        {new Date(event.date).toLocaleDateString('pt-BR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                        {formatLocalDate(event.date)}
                       </div>
                       <h3 className="font-serif text-xl md:text-2xl text-white mb-2">{event.title}</h3>
                       <p className="text-white/50 text-sm leading-relaxed">{event.description}</p>
@@ -804,7 +797,7 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
   const fontFamily = gift.fontFamily || 'Georgia, serif'
 
   useEffect(() => {
-    const start = new Date(gift.dayCountStart || gift.specialDate)
+    const start = parseLocalDate(gift.dayCountStart || gift.specialDate)
     const now = new Date()
     const diff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
     setDaysCount(diff)
