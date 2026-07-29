@@ -1,44 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { put } from '@vercel/blob'
 
 const jsonHeaders = { 'Content-Type': 'application/json; charset=utf-8' }
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
-    const file = formData.get('file') as File
+    const { image } = await request.json()
 
-    if (!file) {
+    if (!image) {
       return NextResponse.json(
-        { error: 'Nenhum arquivo enviado' },
+        { error: 'Nenhuma imagem enviada' },
         { status: 400, headers: jsonHeaders }
       )
     }
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    if (!allowedTypes.includes(file.type)) {
+    if (!image.startsWith('data:image/')) {
       return NextResponse.json(
-        { error: 'Tipo de arquivo não permitido' },
+        { error: 'Formato de imagem inválido' },
         { status: 400, headers: jsonHeaders }
       )
     }
 
-    const maxSize = 10 * 1024 * 1024
-    if (file.size > maxSize) {
+    const maxSize = 5 * 1024 * 1024
+    if (image.length > maxSize) {
       return NextResponse.json(
-        { error: 'Arquivo muito grande (máximo 10MB)' },
+        { error: 'Imagem muito grande' },
         { status: 400, headers: jsonHeaders }
       )
     }
-
-    const blob = await put(file.name, file, {
-      access: 'private',
-      addRandomSuffix: true,
-    })
 
     return NextResponse.json({
       success: true,
-      url: blob.url,
+      url: image,
     }, { headers: jsonHeaders })
   } catch (error) {
     console.error('Error uploading file:', error)

@@ -277,11 +277,41 @@ export default function GiftEditPage() {
 
   const markChanged = () => setHasChanges(true)
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const img = new Image()
+        img.onload = () => {
+          const maxW = 800
+          let { width, height } = img
+          if (width > maxW) {
+            height = height * (maxW / width)
+            width = maxW
+          }
+          const canvas = document.createElement('canvas')
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')!
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(canvas.toDataURL('image/jpeg', 0.7))
+        }
+        img.onerror = reject
+        img.src = reader.result as string
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
   const uploadPhoto = async (file: File): Promise<string | null> => {
-    const formData = new FormData()
-    formData.append("file", file)
     try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData })
+      const dataUrl = await compressImage(file)
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataUrl }),
+      })
       const data = await res.json()
       if (data.success && data.url) return data.url
     } catch {}
