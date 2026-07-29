@@ -772,13 +772,13 @@ export default function BirthdayTemplate({ gift }: BirthdayTemplateProps) {
 
       {renderQuote()}
 
+      <CounterSection daysCount={daysCount} accentColor={accentColor} />
+
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />
       )}
 
       {renderQuote()}
-
-      <CounterSection daysCount={daysCount} accentColor={accentColor} />
 
       {timelineEvents.length > 0 && (
         <TimelineSection events={timelineEvents} accentColor={accentColor} />

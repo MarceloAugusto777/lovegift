@@ -813,6 +813,8 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
 
       {renderQuote()}
 
+      <CounterSection daysCount={daysCount} accentColor={accentColor} />
+
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />
       )}
@@ -824,8 +826,6 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
       )}
 
       {renderQuote()}
-
-      <CounterSection daysCount={daysCount} accentColor={accentColor} />
 
       <RingMoment accentColor={accentColor} />
 

@@ -705,13 +705,13 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
 
       {renderQuote()}
 
+      <CounterSection daysCount={daysCount} accentColor={accentColor} />
+
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />
       )}
 
       {renderQuote()}
-
-      <CounterSection daysCount={daysCount} accentColor={accentColor} />
 
       {timelineEvents.length > 0 && (
         <TimelineSection events={timelineEvents} accentColor={accentColor} />

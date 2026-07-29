@@ -1120,6 +1120,11 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
 
       <PhotosSection photos={photos} />
 
+      <DayCounterSection
+        dayCountStart={gift.dayCountStart}
+        specialDate={gift.specialDate}
+      />
+
       {storySections.length > 0 && (
         <LoveStorySection
           sections={storySections}
@@ -1128,11 +1133,6 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
       )}
 
       {renderQuote()}
-
-      <DayCounterSection
-        dayCountStart={gift.dayCountStart}
-        specialDate={gift.specialDate}
-      />
 
       {timelineEvents.length > 0 && (
         <TimelineSection events={timelineEvents} />

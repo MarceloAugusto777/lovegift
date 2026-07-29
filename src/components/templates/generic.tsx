@@ -334,6 +334,58 @@ export default function GenericTemplate({ gift }: TemplateProps) {
 
       {renderQuote()}
 
+      <section className="relative px-6 py-20 md:py-32">
+        <div className="max-w-2xl mx-auto text-center">
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-xs tracking-widest uppercase mb-12 opacity-50 text-white"
+            style={{ letterSpacing: "0.25em" }}
+          >
+            Tempo ao seu lado
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 1 }}
+          >
+            <AnimatedCounter target={daysTogether} color={color} />
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="text-white/40 text-sm tracking-widest uppercase mt-4"
+              style={{ letterSpacing: "0.2em" }}
+            >
+              dias
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="mt-16 flex items-center justify-center gap-6 text-sm text-white/30"
+          >
+            <div className="flex items-center gap-2">
+              <Calendar size={14} style={{ color }} className="opacity-60" />
+              <span>{formattedDate}</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-white/20" />
+            <div className="flex items-center gap-2">
+              <Clock size={14} style={{ color }} className="opacity-60" />
+              <span>{daysTogether} dias</span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {storySections.length > 0 && (
         <>
           <SectionDivider color={color} />
@@ -452,60 +504,6 @@ export default function GenericTemplate({ gift }: TemplateProps) {
       )}
 
       {renderQuote()}
-
-      <SectionDivider color={color} />
-
-      <section className="relative px-6 py-20 md:py-32">
-        <div className="max-w-2xl mx-auto text-center">
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-xs tracking-widest uppercase mb-12 opacity-50 text-white"
-            style={{ letterSpacing: "0.25em" }}
-          >
-            Tempo ao seu lado
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 1 }}
-          >
-            <AnimatedCounter target={daysTogether} color={color} />
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-white/40 text-sm tracking-widest uppercase mt-4"
-              style={{ letterSpacing: "0.2em" }}
-            >
-              dias
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-16 flex items-center justify-center gap-6 text-sm text-white/30"
-          >
-            <div className="flex items-center gap-2">
-              <Calendar size={14} style={{ color }} className="opacity-60" />
-              <span>{formattedDate}</span>
-            </div>
-            <div className="w-1 h-1 rounded-full bg-white/20" />
-            <div className="flex items-center gap-2">
-              <Clock size={14} style={{ color }} className="opacity-60" />
-              <span>{daysTogether} dias</span>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       {gift.locationUrl && (
         <>
