@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { Heart, Calendar, MapPin, Music, Clock, Sparkles, ChevronDown, BookOpen, Film } from 'lucide-react'
+import PhotoDisplay from '@/components/photo-display'
 
 interface TemplateProps {
   gift: {
@@ -410,13 +411,7 @@ function StoryTimeline({ sections, title }: { sections: StorySection[]; title?: 
 
               <div className={`flex-1 pl-14 md:pl-0 ${index % 2 === 0 ? 'md:text-right md:pr-12' : 'md:text-left md:pl-12'}`}>
                 <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-purple-100/50 shadow-sm inline-block text-left md:max-w-md">
-                  {section.image && (
-                    <img
-                      src={section.image}
-                      alt={section.title}
-                      className="w-full h-40 object-cover rounded-lg mb-4"
-                    />
-                  )}
+                  <PhotoDisplay photos={section.photos || (section.image ? [section.image] : [])} display={section.photoDisplay || 'single'} aspectRatio="16/9" />
                   <h3
                     className="text-lg text-gray-800 font-medium mb-2"
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}

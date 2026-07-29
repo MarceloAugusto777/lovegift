@@ -35,6 +35,8 @@ interface StorySection {
   title: string
   text: string
   photo: string
+  photos?: string[]
+  photoDisplay?: 'carousel' | 'grid' | 'single'
 }
 
 interface TimelineEvent {
@@ -333,11 +335,11 @@ export default function GiftEditPage() {
   }
 
   const addStorySection = () => {
-    setStorySections((prev) => [...prev, { title: "", text: "", photo: "" }])
+    setStorySections((prev) => [...prev, { title: "", text: "", photo: "", photos: [], photoDisplay: "single" }])
     markChanged()
   }
 
-  const updateStorySection = (index: number, field: keyof StorySection, value: string) => {
+  const updateStorySection = (index: number, field: keyof StorySection, value: any) => {
     setStorySections((prev) => prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)))
     markChanged()
   }
@@ -364,8 +366,25 @@ export default function GiftEditPage() {
   const uploadStoryPhoto = async (index: number, file: File) => {
     const url = await uploadPhoto(file)
     if (url) {
+      const section = storySections[index]
+      const currentPhotos = section.photos || (section.photo ? [section.photo] : [])
+      updateStorySection(index, "photos", [...currentPhotos, url])
       updateStorySection(index, "photo", url)
     }
+  }
+
+  const removeStoryPhoto = (sectionIndex: number, photoIndex: number) => {
+    if (!confirm("Tem certeza que deseja remover esta foto?")) return
+    const section = storySections[sectionIndex]
+    const currentPhotos = section.photos || (section.photo ? [section.photo] : [])
+    const newPhotos = currentPhotos.filter((_, i) => i !== photoIndex)
+    updateStorySection(sectionIndex, "photos", newPhotos)
+    if (newPhotos.length > 0) {
+      updateStorySection(sectionIndex, "photo", newPhotos[0])
+    } else {
+      updateStorySection(sectionIndex, "photo", "")
+    }
+    markChanged()
   }
 
   const addTimelineEvent = () => {
@@ -775,34 +794,83 @@ export default function GiftEditPage() {
             />
           </div>
           <div>
-            <label style={labelStyle}>Foto</label>
-            {section.photo ? (
-              <div style={{ position: "relative", display: "inline-block" }}>
-                <img
-                  src={section.photo}
-                  alt={section.title}
-                  style={{ width: "200px", height: "130px", objectFit: "cover", borderRadius: "10px" }}
-                />
-                <button
-                  onClick={() => updateStorySection(index, "photo", "")}
-                  style={{
-                    position: "absolute",
-                    top: "6px",
-                    right: "6px",
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    border: "none",
-                    background: "rgba(0,0,0,0.7)",
-                    color: "#fff",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <X size={12} />
-                </button>
+            <label style={labelStyle}>Fotos</label>
+            {(section.photos && section.photos.length > 0) || section.photo ? (
+              <div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "10px" }}>
+                  {(section.photos && section.photos.length > 0 ? section.photos : section.photo ? [section.photo] : []).map((photoUrl, photoIdx) => (
+                    <div key={photoIdx} style={{ position: "relative", display: "inline-block" }}>
+                      <img
+                        src={photoUrl}
+                        alt={`Foto ${photoIdx + 1}`}
+                        style={{ width: "120px", height: "80px", objectFit: "cover", borderRadius: "8px" }}
+                      />
+                      <button
+                        onClick={() => removeStoryPhoto(index, photoIdx)}
+                        style={{
+                          position: "absolute",
+                          top: "4px",
+                          right: "4px",
+                          width: "22px",
+                          height: "22px",
+                          borderRadius: "50%",
+                          border: "none",
+                          background: "rgba(0,0,0,0.7)",
+                          color: "#fff",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "10px",
+                        }}
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <label
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "8px 14px",
+                      borderRadius: "8px",
+                      border: "2px dashed rgba(255,255,255,0.15)",
+                      color: "rgba(255,255,255,0.4)",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <Upload size={14} /> Adicionar foto
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) uploadStoryPhoto(index, e.target.files[0])
+                      }}
+                    />
+                  </label>
+                  <select
+                    value={section.photoDisplay || "single"}
+                    onChange={(e) => updateStorySection(index, "photoDisplay", e.target.value)}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: "8px",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      background: "rgba(255,255,255,0.06)",
+                      color: "rgba(255,255,255,0.7)",
+                      fontSize: "12px",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="single">Foto unica</option>
+                    <option value="carousel">Carrossel</option>
+                    <option value="grid">Grade</option>
+                  </select>
+                </div>
               </div>
             ) : (
               <label

@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Star,
 } from "lucide-react"
+import PhotoDisplay from "@/components/photo-display"
 
 interface TemplateProps {
   gift: {
@@ -376,18 +377,7 @@ export default function GenericTemplate({ gift }: TemplateProps) {
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.8, delay: 0.1 }}
                   >
-                    {section.image && (
-                      <div className="overflow-hidden rounded-lg mb-6">
-                        <motion.img
-                          src={section.image}
-                          alt={section.title || `Capítulo ${index + 1}`}
-                          className="w-full h-64 md:h-80 object-cover"
-                          whileHover={{ scale: 1.02 }}
-                          transition={{ duration: 0.6 }}
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
+                    <PhotoDisplay photos={section.photos || (section.image ? [section.image] : [])} display={section.photoDisplay || 'single'} aspectRatio="16/9" />
                     {section.title && (
                       <h3
                         className="text-lg md:text-xl font-light mb-3"

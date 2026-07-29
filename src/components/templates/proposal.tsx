@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import PhotoDisplay from '@/components/photo-display'
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 80 },
@@ -404,21 +405,7 @@ function StorySection({ sections, accentColor }: { sections: StorySection[]; acc
               viewport={{ once: true, margin: '-50px' }}
               className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-10 md:gap-20 items-center`}
             >
-              {section.photo && (
-                <motion.div className="w-full md:w-1/2" variants={scaleIn}>
-                  <div className="relative group">
-                    <div
-                      className="absolute -inset-4 rounded-3xl opacity-20 blur-2xl group-hover:opacity-40 transition-opacity duration-700"
-                      style={{ background: accentColor }}
-                    />
-                    <img
-                      src={section.photo}
-                      alt={section.title}
-                      className="relative w-full aspect-[4/3] object-cover rounded-2xl shadow-2xl"
-                    />
-                  </div>
-                </motion.div>
-              )}
+              <PhotoDisplay photos={section.photos || (section.photo ? [section.photo] : [])} display={section.photoDisplay || 'single'} aspectRatio="16/9" />
 
               <div className={`w-full ${section.photo ? 'md:w-1/2' : 'max-w-2xl mx-auto'}`}>
                 <div className="space-y-5">

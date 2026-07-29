@@ -7,6 +7,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion"
+import PhotoDisplay from "@/components/photo-display"
 
 interface TemplateProps {
   gift: {
@@ -624,21 +625,7 @@ function LoveStorySection({
                 i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
               } gap-8 md:gap-16 items-center`}
             >
-              {section.photo && (
-                <div className="w-full md:w-1/2">
-                  <div className="relative group">
-                    <div
-                      className="absolute -inset-3 rounded-2xl opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-700"
-                      style={{ background: ACCENT }}
-                    />
-                    <img
-                      src={section.photo}
-                      alt={section.title}
-                      className="relative w-full aspect-[4/3] object-cover rounded-2xl shadow-2xl border border-white/10"
-                    />
-                  </div>
-                </div>
-              )}
+              <PhotoDisplay photos={section.photos || (section.photo ? [section.photo] : [])} display={section.photoDisplay || 'single'} aspectRatio="16/9" />
 
               <div
                 className={`w-full ${
