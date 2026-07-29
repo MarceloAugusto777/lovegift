@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { put } from '@vercel/blob'
 
 const jsonHeaders = { 'Content-Type': 'application/json; charset=utf-8' }
 
@@ -31,13 +30,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const blob = await put(file.name, file, {
-      access: 'public',
-    })
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    const base64 = buffer.toString('base64')
+    const dataUrl = `data:${file.type};base64,${base64}`
 
     return NextResponse.json({
       success: true,
-      url: blob.url,
+      url: dataUrl,
     }, { headers: jsonHeaders })
   } catch (error) {
     console.error('Error uploading file:', error)
