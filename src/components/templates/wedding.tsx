@@ -326,50 +326,6 @@ function PhotoGallery({ photos }: { photos: string[] }) {
   )
 }
 
-function LoveQuotes({ quotes }: { quotes: string[] }) {
-  const { ref, isInView } = useScrollReveal(0.15)
-
-  if (quotes.length === 0) return null
-
-  return (
-    <section ref={ref} className="py-20 px-6">
-      <div className="max-w-3xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <Heart size={28} className="text-purple-300 mx-auto mb-4 fill-purple-100" />
-          <p className="text-purple-400 tracking-[0.3em] uppercase text-xs font-light">
-            Words Of Love
-          </p>
-        </motion.div>
-
-        <div className="space-y-8">
-          {quotes.map((quote, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -40 : 40 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.7, delay: index * 0.15 }}
-              className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}
-            >
-              <div className="relative max-w-md px-8 py-6 bg-white/70 backdrop-blur-sm rounded-2xl border border-purple-100/60 shadow-sm">
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-purple-200/50 rounded-tl-2xl -translate-x-2 -translate-y-2" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-purple-200/50 rounded-br-2xl translate-x-2 translate-y-2" />
-                <p className="text-gray-600 italic font-light leading-relaxed text-lg">
-                  &ldquo;{quote}&rdquo;
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function StoryTimeline({ sections, title }: { sections: StorySection[]; title?: string }) {
   const { ref, isInView } = useScrollReveal(0.1)
 
@@ -662,6 +618,28 @@ function Footer({ clientName }: { clientName?: string }) {
 export default function WeddingTemplate({ gift }: TemplateProps) {
   const photos = useMemo(() => parseJsonSafe<string[]>(gift.photos, []), [gift.photos])
   const loveQuotes = useMemo(() => parseJsonSafe<string[]>(gift.loveQuotes, []), [gift.loveQuotes])
+  let quoteIndex = 0
+  const renderQuote = () => {
+    if (quoteIndex >= loveQuotes.length) return null
+    const q = loveQuotes[quoteIndex]
+    quoteIndex++
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '40px 20px',
+        fontStyle: 'italic',
+        fontSize: '18px',
+        color: 'rgba(255,255,255,0.7)',
+        maxWidth: '600px',
+        margin: '0 auto',
+        lineHeight: 1.8,
+      }}>
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+        {q}
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+      </div>
+    )
+  }
   const storySections = useMemo(() => parseJsonSafe<StorySection[]>(gift.storySections, []), [gift.storySections])
   const timelineEvents = useMemo(() => parseJsonSafe<TimelineEvent[]>(gift.timelineEvents, []), [gift.timelineEvents])
 
@@ -691,21 +669,42 @@ export default function WeddingTemplate({ gift }: TemplateProps) {
 
       <OrnamentDivider inverted />
 
-      <LoveQuotes quotes={loveQuotes} />
+      {renderQuote()}
 
       <OrnamentDivider />
 
       <StoryTimeline sections={storySections} title={gift.storyTitle} />
 
+      {renderQuote()}
+
       <OrnamentDivider inverted />
 
       <EventsTimeline events={timelineEvents} />
+
+      {renderQuote()}
 
       <OrnamentDivider />
 
       <DayCounter dayCountStart={gift.dayCountStart} />
 
       <LocationSection url={gift.locationUrl} name={gift.locationName} />
+
+      {loveQuotes.slice(quoteIndex).map((q, i) => (
+        <div key={i} style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          fontStyle: 'italic',
+          fontSize: '18px',
+          color: 'rgba(255,255,255,0.7)',
+          maxWidth: '600px',
+          margin: '0 auto',
+          lineHeight: 1.8,
+        }}>
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+          {q}
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+        </div>
+      ))}
 
       <Footer clientName={gift.clientName} />
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import ImageCropper from "@/components/image-cropper"
 import {
   ArrowLeft,
   Save,
@@ -152,6 +153,9 @@ export default function GiftEditPage() {
   const [templateId, setTemplateId] = useState("romantic")
   const [dayCountStart, setDayCountStart] = useState("")
 
+  const [cropImage, setCropImage] = useState<string | null>(null)
+  const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | null>(null)
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -277,36 +281,32 @@ export default function GiftEditPage() {
 
   const markChanged = () => setHasChanges(true)
 
-  const compressImage = (file: File): Promise<string> => {
+  const compressImage = async (blob: Blob): Promise<string> => {
+    const img = new Image()
+    const url = URL.createObjectURL(blob)
     return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const img = new Image()
-        img.onload = () => {
-          const maxW = 800
-          let { width, height } = img
-          if (width > maxW) {
-            height = height * (maxW / width)
-            width = maxW
-          }
-          const canvas = document.createElement('canvas')
-          canvas.width = width
-          canvas.height = height
-          const ctx = canvas.getContext('2d')!
-          ctx.drawImage(img, 0, 0, width, height)
-          resolve(canvas.toDataURL('image/jpeg', 0.7))
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const maxW = 800
+        let { width, height } = img
+        if (width > maxW) {
+          height = height * (maxW / width)
+          width = maxW
         }
-        img.onerror = reject
-        img.src = reader.result as string
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(img, 0, 0, width, height)
+        resolve(canvas.toDataURL('image/jpeg', 0.7))
       }
-      reader.onerror = reject
-      reader.readAsDataURL(file)
+      img.onerror = reject
+      img.src = url
     })
   }
 
-  const uploadPhoto = async (file: File): Promise<string | null> => {
+  const uploadPhoto = async (dataUrl: string): Promise<string | null> => {
     try {
-      const dataUrl = await compressImage(file)
       const res = await fetch("/api/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -316,6 +316,30 @@ export default function GiftEditPage() {
       if (data.success && data.url) return data.url
     } catch {}
     return null
+  }
+
+  const handleCropConfirm = async (croppedBlob: Blob) => {
+    const compressed = await compressImage(croppedBlob)
+    const url = await uploadPhoto(compressed)
+    if (!url) { setCropImage(null); setCropTarget(null); return }
+    if (cropTarget?.type === 'gallery') {
+      setPhotos((prev) => [...prev, url])
+    } else if (cropTarget?.type === 'story') {
+      const section = storySections[cropTarget.index]
+      const currentPhotos = section.photos || (section.photo ? [section.photo] : [])
+      updateStorySection(cropTarget.index, "photos", [...currentPhotos, url])
+      updateStorySection(cropTarget.index, "photo", url)
+    } else if (cropTarget?.type === 'timeline') {
+      updateTimelineEvent(cropTarget.index, "photo", url)
+    }
+    markChanged()
+    setCropImage(null)
+    setCropTarget(null)
+  }
+
+  const handleCropCancel = () => {
+    setCropImage(null)
+    setCropTarget(null)
   }
 
   if (!isAuthenticated) {
@@ -345,16 +369,21 @@ export default function GiftEditPage() {
     )
   }
 
+  const readFileAsDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
   const addPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
-    for (let i = 0; i < files.length; i++) {
-      const url = await uploadPhoto(files[i])
-      if (url) {
-        setPhotos((prev) => [...prev, url])
-        markChanged()
-      }
-    }
+    const dataUrl = await readFileAsDataUrl(files[0])
+    setCropImage(dataUrl)
+    setCropTarget({ type: 'gallery' })
     e.target.value = ""
   }
 
@@ -394,13 +423,9 @@ export default function GiftEditPage() {
   }
 
   const uploadStoryPhoto = async (index: number, file: File) => {
-    const url = await uploadPhoto(file)
-    if (url) {
-      const section = storySections[index]
-      const currentPhotos = section.photos || (section.photo ? [section.photo] : [])
-      updateStorySection(index, "photos", [...currentPhotos, url])
-      updateStorySection(index, "photo", url)
-    }
+    const dataUrl = await readFileAsDataUrl(file)
+    setCropImage(dataUrl)
+    setCropTarget({ type: 'story', index })
   }
 
   const removeStoryPhoto = (sectionIndex: number, photoIndex: number) => {
@@ -447,10 +472,9 @@ export default function GiftEditPage() {
   }
 
   const uploadTimelinePhoto = async (index: number, file: File) => {
-    const url = await uploadPhoto(file)
-    if (url) {
-      updateTimelineEvent(index, "photo", url)
-    }
+    const dataUrl = await readFileAsDataUrl(file)
+    setCropImage(dataUrl)
+    setCropTarget({ type: 'timeline', index })
   }
 
   const addQuote = () => {
@@ -1725,6 +1749,15 @@ export default function GiftEditPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {cropImage && (
+        <ImageCropper
+          image={cropImage}
+          onCrop={handleCropConfirm}
+          onCancel={handleCropCancel}
+          aspect={4/3}
+        />
+      )}
     </div>
   )
 }

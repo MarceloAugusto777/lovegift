@@ -449,67 +449,6 @@ function PhotosSection({ photos, accentColor }: { photos: string[]; accentColor:
   )
 }
 
-function LoveQuotesSection({ quotes, accentColor }: { quotes: string[]; accentColor: string }) {
-  if (quotes.length === 0) return null
-
-  return (
-    <section className="relative py-20 md:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-yellow-950/20 to-black/90" />
-
-      <div className="relative z-10 max-w-3xl mx-auto px-6">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="space-y-16"
-        >
-          <motion.div variants={fadeUp} className="text-center mb-8">
-            <h2 className="font-serif text-3xl md:text-4xl text-white/90">
-              Palavras do Coração
-            </h2>
-            <div
-              className="w-20 h-px mx-auto mt-4"
-              style={{ background: `linear-gradient(to right, transparent, ${accentColor}, transparent)` }}
-            />
-          </motion.div>
-
-          {quotes.map((quote, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15, duration: 0.7 }}
-              className="text-center"
-            >
-              <motion.div
-                className="inline-block mb-4 text-3xl"
-                style={{ color: accentColor }}
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 }}
-              >
-                &ldquo;
-              </motion.div>
-              <p className="font-serif text-lg md:text-xl text-white/60 italic leading-relaxed max-w-2xl mx-auto">
-                {quote}
-              </p>
-              <motion.div
-                className="inline-block mt-4 text-3xl"
-                style={{ color: accentColor }}
-                animate={{ rotate: [0, -5, 5, 0] }}
-                transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 + 2 }}
-              >
-                &rdquo;
-              </motion.div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
 function TimelineSection({ events, accentColor }: { events: TimelineEvent[]; accentColor: string }) {
   if (events.length === 0) return null
 
@@ -789,6 +728,28 @@ export default function BirthdayTemplate({ gift }: BirthdayTemplateProps) {
 
   const photos = JSON.parse(gift.photos) as string[]
   const loveQuotes = JSON.parse(gift.loveQuotes) as string[]
+  let quoteIndex = 0
+  const renderQuote = () => {
+    if (quoteIndex >= loveQuotes.length) return null
+    const q = loveQuotes[quoteIndex]
+    quoteIndex++
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '40px 20px',
+        fontStyle: 'italic',
+        fontSize: '18px',
+        color: 'rgba(255,255,255,0.7)',
+        maxWidth: '600px',
+        margin: '0 auto',
+        lineHeight: 1.8,
+      }}>
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+        {q}
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+      </div>
+    )
+  }
   const storySections = JSON.parse(gift.storySections) as StorySection[]
   const timelineEvents = JSON.parse(gift.timelineEvents) as TimelineEvent[]
   const accentColor = gift.accentColor || '#eab308'
@@ -814,13 +775,13 @@ export default function BirthdayTemplate({ gift }: BirthdayTemplateProps) {
         <PhotosSection photos={photos} accentColor={accentColor} />
       )}
 
-      {loveQuotes.length > 0 && (
-        <LoveQuotesSection quotes={loveQuotes} accentColor={accentColor} />
-      )}
+      {renderQuote()}
 
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />
       )}
+
+      {renderQuote()}
 
       <CounterSection daysCount={daysCount} accentColor={accentColor} />
 
@@ -828,11 +789,30 @@ export default function BirthdayTemplate({ gift }: BirthdayTemplateProps) {
         <TimelineSection events={timelineEvents} accentColor={accentColor} />
       )}
 
+      {renderQuote()}
+
       <LocationSection
         locationUrl={gift.locationUrl}
         locationName={gift.locationName}
         accentColor={accentColor}
       />
+
+      {loveQuotes.slice(quoteIndex).map((q, i) => (
+        <div key={i} style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          fontStyle: 'italic',
+          fontSize: '18px',
+          color: 'rgba(255,255,255,0.7)',
+          maxWidth: '600px',
+          margin: '0 auto',
+          lineHeight: 1.8,
+        }}>
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+          {q}
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+        </div>
+      ))}
 
       <FooterSection clientName={gift.clientName} accentColor={accentColor} />
 

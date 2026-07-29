@@ -11,7 +11,6 @@ import {
   Music,
   BookOpen,
   ChevronDown,
-  Star,
 } from "lucide-react"
 import PhotoDisplay from "@/components/photo-display"
 
@@ -128,6 +127,28 @@ function SectionDivider({ color }: { color: string }) {
 export default function GenericTemplate({ gift }: TemplateProps) {
   const photos = parseJsonArray(gift.photos)
   const loveQuotes = parseJsonArray(gift.loveQuotes)
+  let quoteIndex = 0
+  const renderQuote = () => {
+    if (quoteIndex >= loveQuotes.length) return null
+    const q = loveQuotes[quoteIndex]
+    quoteIndex++
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '40px 20px',
+        fontStyle: 'italic',
+        fontSize: '18px',
+        color: 'rgba(255,255,255,0.7)',
+        maxWidth: '600px',
+        margin: '0 auto',
+        lineHeight: 1.8,
+      }}>
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+        {q}
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+      </div>
+    )
+  }
   const storySections = parseStorySections(gift.storySections)
   const timelineEvents = parseTimelineEvents(gift.timelineEvents)
 
@@ -311,47 +332,7 @@ export default function GenericTemplate({ gift }: TemplateProps) {
         </>
       )}
 
-      {loveQuotes.length > 0 && (
-        <>
-          <SectionDivider color={color} />
-          <section className="relative px-6 py-16 md:py-24">
-            <div className="max-w-2xl mx-auto">
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-xs tracking-widest uppercase mb-12 text-center opacity-50 text-white"
-                style={{ letterSpacing: "0.25em" }}
-              >
-                Palavras que ficam
-              </motion.p>
-
-              <div className="space-y-8">
-                {loveQuotes.map((quote, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.8, delay: 0.1 }}
-                    className="relative pl-8 py-4"
-                  >
-                    <div
-                      className="absolute left-0 top-0 bottom-0 w-px"
-                      style={{ background: `linear-gradient(to bottom, transparent, ${color}60, transparent)` }}
-                    />
-                    <Star size={8} style={{ color }} className="absolute left-[-3px] top-4" fill={color} />
-                    <p className="text-white/70 text-lg italic font-light leading-relaxed">
-                      {quote}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </>
-      )}
+      {renderQuote()}
 
       {storySections.length > 0 && (
         <>
@@ -400,6 +381,8 @@ export default function GenericTemplate({ gift }: TemplateProps) {
           </section>
         </>
       )}
+
+      {renderQuote()}
 
       {timelineEvents.length > 0 && (
         <>
@@ -467,6 +450,8 @@ export default function GenericTemplate({ gift }: TemplateProps) {
           </section>
         </>
       )}
+
+      {renderQuote()}
 
       <SectionDivider color={color} />
 
@@ -587,6 +572,23 @@ export default function GenericTemplate({ gift }: TemplateProps) {
           </div>
         </motion.div>
       )}
+
+      {loveQuotes.slice(quoteIndex).map((q, i) => (
+        <div key={i} style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          fontStyle: 'italic',
+          fontSize: '18px',
+          color: 'rgba(255,255,255,0.7)',
+          maxWidth: '600px',
+          margin: '0 auto',
+          lineHeight: 1.8,
+        }}>
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+          {q}
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+        </div>
+      ))}
 
       <footer className="relative px-6 py-20 md:py-32">
         <motion.div

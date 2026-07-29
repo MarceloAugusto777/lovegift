@@ -653,43 +653,6 @@ function PhotosSection({ photos, accentColor }: { photos: string[]; accentColor:
   )
 }
 
-function QuotesSection({ quotes, accentColor }: { quotes: string[]; accentColor: string }) {
-  if (quotes.length === 0) return null
-
-  return (
-    <section className="relative py-20 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-rose-950/20 to-neutral-950" />
-      <div className="relative z-10 max-w-2xl mx-auto px-6">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          className="space-y-12"
-        >
-          {quotes.map((quote, i) => (
-            <motion.div
-              key={i}
-              variants={fadeUp}
-              className="text-center"
-            >
-              <p className="font-serif text-lg md:text-xl text-white/40 italic leading-relaxed">
-                &ldquo;{quote}&rdquo;
-              </p>
-              {i < quotes.length - 1 && (
-                <div
-                  className="w-12 h-px mx-auto mt-8"
-                  style={{ background: `linear-gradient(to right, transparent, ${accentColor}44, transparent)` }}
-                />
-              )}
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
 function LocationSection({ locationUrl, locationName, accentColor }: { locationUrl?: string; locationName?: string; accentColor: string }) {
   if (!locationUrl && !locationName) return null
 
@@ -812,6 +775,28 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
 
   const photos = JSON.parse(gift.photos) as string[]
   const loveQuotes = JSON.parse(gift.loveQuotes) as string[]
+  let quoteIndex = 0
+  const renderQuote = () => {
+    if (quoteIndex >= loveQuotes.length) return null
+    const q = loveQuotes[quoteIndex]
+    quoteIndex++
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '40px 20px',
+        fontStyle: 'italic',
+        fontSize: '18px',
+        color: 'rgba(255,255,255,0.7)',
+        maxWidth: '600px',
+        margin: '0 auto',
+        lineHeight: 1.8,
+      }}>
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+        {q}
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+      </div>
+    )
+  }
   const storySections = JSON.parse(gift.storySections) as StorySection[]
   const timelineEvents = JSON.parse(gift.timelineEvents) as TimelineEvent[]
   const accentColor = gift.accentColor || '#e11d48'
@@ -831,15 +816,19 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
 
       <MessageSection message={gift.message} accentColor={accentColor} senderName={gift.senderName} />
 
-      <QuotesSection quotes={loveQuotes} accentColor={accentColor} />
+      {renderQuote()}
 
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />
       )}
 
+      {renderQuote()}
+
       {timelineEvents.length > 0 && (
         <TimelineSection events={timelineEvents} accentColor={accentColor} />
       )}
+
+      {renderQuote()}
 
       <CounterSection daysCount={daysCount} accentColor={accentColor} />
 
@@ -852,6 +841,23 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
         locationName={gift.locationName}
         accentColor={accentColor}
       />
+
+      {loveQuotes.slice(quoteIndex).map((q, i) => (
+        <div key={i} style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          fontStyle: 'italic',
+          fontSize: '18px',
+          color: 'rgba(255,255,255,0.7)',
+          maxWidth: '600px',
+          margin: '0 auto',
+          lineHeight: 1.8,
+        }}>
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+          {q}
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+        </div>
+      ))}
 
       <FooterSection clientName={gift.clientName} accentColor={accentColor} />
 

@@ -667,6 +667,28 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
 
   const photos = JSON.parse(gift.photos) as string[]
   const loveQuotes = JSON.parse(gift.loveQuotes) as string[]
+  let quoteIndex = 0
+  const renderQuote = () => {
+    if (quoteIndex >= loveQuotes.length) return null
+    const q = loveQuotes[quoteIndex]
+    quoteIndex++
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '40px 20px',
+        fontStyle: 'italic',
+        fontSize: '18px',
+        color: 'rgba(255,255,255,0.7)',
+        maxWidth: '600px',
+        margin: '0 auto',
+        lineHeight: 1.8,
+      }}>
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+        {q}
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+      </div>
+    )
+  }
   const storySections = JSON.parse(gift.storySections) as StorySection[]
   const timelineEvents = JSON.parse(gift.timelineEvents) as TimelineEvent[]
   const accentColor = gift.accentColor || '#e11d48'
@@ -686,39 +708,21 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
 
       <MessageSection message={gift.message} accentColor={accentColor} />
 
-      {loveQuotes.length > 0 && (
-        <section className="relative py-16 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-rose-950/30 to-black/90" />
-          <div className="relative z-10 max-w-2xl mx-auto px-6">
-            <AnimatePresence>
-              {loveQuotes.map((quote, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.2 }}
-                  className="text-center mb-8 last:mb-0"
-                >
-                  <p className="font-serif text-lg text-white/50 italic leading-relaxed">
-                    &ldquo;{quote}&rdquo;
-                  </p>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </section>
-      )}
+      {renderQuote()}
 
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />
       )}
+
+      {renderQuote()}
 
       <CounterSection daysCount={daysCount} accentColor={accentColor} />
 
       {timelineEvents.length > 0 && (
         <TimelineSection events={timelineEvents} accentColor={accentColor} />
       )}
+
+      {renderQuote()}
 
       <PhotosSection photos={photos} accentColor={accentColor} />
 
@@ -727,6 +731,23 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
         locationName={gift.locationName}
         accentColor={accentColor}
       />
+
+      {loveQuotes.slice(quoteIndex).map((q, i) => (
+        <div key={i} style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          fontStyle: 'italic',
+          fontSize: '18px',
+          color: 'rgba(255,255,255,0.7)',
+          maxWidth: '600px',
+          margin: '0 auto',
+          lineHeight: 1.8,
+        }}>
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+          {q}
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+        </div>
+      ))}
 
       <FooterSection clientName={gift.clientName} accentColor={accentColor} />
 

@@ -433,77 +433,6 @@ function MessageSection({ message }: { message: string }) {
   )
 }
 
-function LoveQuotesSection({ quotes }: { quotes: string[] }) {
-  if (quotes.length === 0) return null
-
-  return (
-    <section className="relative py-20 md:py-28">
-      <div className="absolute inset-0 bg-gradient-to-b from-black to-black/90" />
-
-      <div className="relative z-10 max-w-3xl mx-auto px-6">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-          variants={staggerContainer}
-          className="space-y-14"
-        >
-          <motion.div variants={fadeUp} className="text-center mb-12">
-            <h2
-              className="font-serif text-3xl md:text-4xl text-white/90"
-              style={{ fontFamily: "Georgia, serif" }}
-            >
-              Palavras de Amor
-            </h2>
-            <div
-              className="w-24 h-px mx-auto mt-4"
-              style={{
-                background: `linear-gradient(to right, transparent, ${ACCENT}, transparent)`,
-              }}
-            />
-          </motion.div>
-
-          {quotes.map((quote, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.7, delay: i * 0.1 }}
-              className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
-            >
-              <div
-                className="relative max-w-lg rounded-2xl p-6 md:p-8 border"
-                style={{
-                  background: `linear-gradient(135deg, ${ACCENT}11, ${ACCENT}08)`,
-                  borderColor: `${ACCENT}22`,
-                }}
-              >
-                <svg
-                  className="absolute -top-3 -left-2"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill={ACCENT}
-                  opacity="0.4"
-                >
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                <p
-                  className="font-serif text-base md:text-lg text-white/70 italic leading-relaxed pl-4"
-                  style={{ fontFamily: "Georgia, serif" }}
-                >
-                  &ldquo;{quote}&rdquo;
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
 function PhotosSection({ photos }: { photos: string[] }) {
   if (photos.length === 0) return null
 
@@ -1127,6 +1056,28 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
     }
   }, [gift.photos])
 
+  let quoteIndex = 0
+  const renderQuote = () => {
+    if (quoteIndex >= loveQuotes.length) return null
+    const q = loveQuotes[quoteIndex]
+    quoteIndex++
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '40px 20px',
+        fontStyle: 'italic',
+        fontSize: '18px',
+        color: 'rgba(255,255,255,0.7)',
+        maxWidth: '600px',
+        margin: '0 auto',
+        lineHeight: 1.8,
+      }}>
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+        {q}
+        <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+      </div>
+    )
+  }
   const loveQuotes = useMemo(() => {
     try {
       return JSON.parse(gift.loveQuotes) as string[]
@@ -1170,9 +1121,7 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
 
       <MessageSection message={gift.message} />
 
-      {loveQuotes.length > 0 && (
-        <LoveQuotesSection quotes={loveQuotes} />
-      )}
+      {renderQuote()}
 
       <PhotosSection photos={photos} />
 
@@ -1183,6 +1132,8 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
         />
       )}
 
+      {renderQuote()}
+
       <DayCounterSection
         dayCountStart={gift.dayCountStart}
         specialDate={gift.specialDate}
@@ -1192,10 +1143,29 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
         <TimelineSection events={timelineEvents} />
       )}
 
+      {renderQuote()}
+
       <LocationSection
         locationUrl={gift.locationUrl}
         locationName={gift.locationName}
       />
+
+      {loveQuotes.slice(quoteIndex).map((q, i) => (
+        <div key={i} style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          fontStyle: 'italic',
+          fontSize: '18px',
+          color: 'rgba(255,255,255,0.7)',
+          maxWidth: '600px',
+          margin: '0 auto',
+          lineHeight: 1.8,
+        }}>
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&ldquo;</span>
+          {q}
+          <span style={{ fontSize: '32px', opacity: 0.4 }}>&rdquo;</span>
+        </div>
+      ))}
 
       <FooterSection clientName={gift.clientName} />
 
