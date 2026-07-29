@@ -39,6 +39,8 @@ interface StorySection {
   title?: string
   text?: string
   image?: string
+  photos?: string[]
+  photoDisplay?: string
 }
 
 interface TimelineEvent {

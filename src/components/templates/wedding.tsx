@@ -29,6 +29,8 @@ interface StorySection {
   title: string
   content: string
   image?: string
+  photos?: string[]
+  photoDisplay?: string
 }
 
 interface TimelineEvent {

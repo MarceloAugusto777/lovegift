@@ -47,6 +47,8 @@ interface StorySection {
   title: string
   text: string
   photo?: string
+  photos?: string[]
+  photoDisplay?: string
 }
 
 interface RomanticTemplateProps {
