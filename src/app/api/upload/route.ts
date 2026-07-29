@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { nanoid } from 'nanoid'
+import { v2 as cloudinary } from 'cloudinary'
 
 const jsonHeaders = { 'Content-Type': 'application/json; charset=utf-8' }
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,20 +40,16 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    const uploadDir = join(process.cwd(), 'public', 'uploads')
-    await mkdir(uploadDir, { recursive: true })
+    const dataUri = `data:${file.type};base64,${buffer.toString('base64')}`
 
-    const ext = file.name.split('.').pop() || 'jpg'
-    const filename = `${nanoid()}.${ext}`
-    const filepath = join(uploadDir, filename)
-
-    await writeFile(filepath, buffer)
-
-    const url = `/uploads/${filename}`
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: 'lovegift',
+      resource_type: 'image',
+    })
 
     return NextResponse.json({
       success: true,
-      url
+      url: result.secure_url,
     }, { headers: jsonHeaders })
   } catch (error) {
     console.error('Error uploading file:', error)
