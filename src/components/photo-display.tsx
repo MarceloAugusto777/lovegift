@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 
 interface PhotoDisplayProps {
   photos: string[]
-  display?: 'carousel' | 'grid' | 'single'
+  display?: string
   aspectRatio?: string
   className?: string
 }
