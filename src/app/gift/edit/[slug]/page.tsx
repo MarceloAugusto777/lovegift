@@ -196,7 +196,7 @@ export default function GiftEditPage() {
       const g = data.gift
       setGift(g)
       setCoupleName(g.coupleName || "")
-      setSpecialDate(g.specialDate ? g.specialDate.split('T')[0] : "")
+      setSpecialDate(g.specialDate || "")
       setMessage(g.message || "")
       setSenderName(g.senderName || "")
       setClientName(g.clientName || "")
@@ -207,7 +207,7 @@ export default function GiftEditPage() {
       setAccentColor(g.accentColor || "#e11d48")
       setFontFamily(g.fontFamily || "Playfair Display")
       setTemplateId(g.template?.slug || "romantic")
-      setDayCountStart(g.dayCountStart ? g.dayCountStart.split('T')[0] : (g.specialDate ? g.specialDate.split('T')[0] : ""))
+      setDayCountStart(g.dayCountStart || g.specialDate || "")
 
       try {
         setPhotos(typeof g.photos === "string" ? JSON.parse(g.photos) : g.photos || [])
@@ -525,7 +525,7 @@ export default function GiftEditPage() {
 
   const renderInfoTab = () => {
     const daysCount = dayCountStart
-      ? Math.floor((Date.now() - new Date(dayCountStart).getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.floor((Date.now() - new Date(dayCountStart + 'T12:00:00Z').getTime()) / (1000 * 60 * 60 * 24))
       : 0
 
     return (

@@ -40,13 +40,13 @@ export function formatDate(date: Date): string {
 }
 
 export function parseLocalDate(dateStr: string): Date {
-  const [y, m, d] = dateStr.split('T')[0].split('-').map(Number)
+  const [y, m, d] = dateStr.split('-').map(Number)
   return new Date(y, m - 1, d)
 }
 
 export function formatLocalDate(dateStr: string): string {
   if (!dateStr) return ''
-  const parts = dateStr.split('T')[0].split('-')
+  const parts = dateStr.replace(/ .*$/, '').split('-')
   if (parts.length !== 3) return dateStr
   const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
   return `${parseInt(parts[2])} de ${months[parseInt(parts[1]) - 1]} de ${parts[0]}`

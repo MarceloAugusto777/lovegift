@@ -26,7 +26,7 @@ export async function PUT(
     const updateData: Record<string, unknown> = {}
 
     if (body.coupleName !== undefined) updateData.coupleName = body.coupleName
-    if (body.specialDate !== undefined) updateData.specialDate = new Date(body.specialDate)
+    if (body.specialDate !== undefined) updateData.specialDate = body.specialDate
     if (body.message !== undefined) updateData.message = body.message
     if (body.photos !== undefined) updateData.photos = JSON.stringify(body.photos)
     if (body.loveQuotes !== undefined) updateData.loveQuotes = JSON.stringify(body.loveQuotes)
@@ -41,7 +41,7 @@ export async function PUT(
     if (body.storyTitle !== undefined) updateData.storyTitle = body.storyTitle
     if (body.storySections !== undefined) updateData.storySections = JSON.stringify(body.storySections)
     if (body.timelineEvents !== undefined) updateData.timelineEvents = JSON.stringify(body.timelineEvents)
-    if (body.dayCountStart !== undefined) updateData.dayCountStart = new Date(body.dayCountStart)
+    if (body.dayCountStart !== undefined) updateData.dayCountStart = body.dayCountStart
     if (body.templateId !== undefined) {
       const template = await prisma.template.findUnique({ where: { slug: body.templateId } })
       if (template) updateData.templateId = template.id

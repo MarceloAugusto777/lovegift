@@ -27,12 +27,12 @@ model Gift {
   templateId    String
   
   coupleName    String
-  specialDate   DateTime
+  specialDate   String
   message       String
   locationUrl   String?
   locationName  String?
   musicUrl      String?
-  dayCountStart  DateTime
+  dayCountStart  String
   
   photos        String   @default("[]")
   loveQuotes    String   @default("[]")

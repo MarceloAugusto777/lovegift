@@ -48,8 +48,8 @@ export default function GiftPage() {
         const giftData = data.gift
         setGift({
           ...giftData,
-          specialDate: giftData.specialDate?.split('T')[0] || '',
-          dayCountStart: giftData.dayCountStart?.split('T')[0] || '',
+          specialDate: giftData.specialDate || '',
+          dayCountStart: giftData.dayCountStart || '',
           template: giftData.template
         })
       } else {
