@@ -427,7 +427,7 @@ function EventsTimeline({ events }: { events: TimelineEvent[] }) {
                 <div>
                   {event.date && (
                     <p className="text-purple-400 text-xs tracking-wider uppercase mb-1">
-                      {event.date}
+                      {formatLocalDate(event.date)}
                     </p>
                   )}
                   <h3

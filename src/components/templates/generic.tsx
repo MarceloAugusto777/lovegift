@@ -480,7 +480,7 @@ export default function GenericTemplate({ gift }: TemplateProps) {
                             className="text-xs tracking-widest uppercase mb-2 opacity-60"
                             style={{ color }}
                           >
-                            {event.date}
+                            {formatLocalDate(event.date)}
                           </p>
                         )}
                         {event.title && (
