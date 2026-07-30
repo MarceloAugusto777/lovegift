@@ -455,7 +455,7 @@ function DayCounter({ dayCountStart }: { dayCountStart: string }) {
 
   useEffect(() => {
     const calculate = () =>
-      Math.floor((Date.now() - new Date(dayCountStart).getTime()) / (1000 * 60 * 60 * 24))
+      Math.floor((Date.now() - parseLocalDate(dayCountStart).getTime()) / (1000 * 60 * 60 * 24))
     setDays(calculate())
     const interval = setInterval(() => setDays(calculate()), 60000)
     return () => clearInterval(interval)
