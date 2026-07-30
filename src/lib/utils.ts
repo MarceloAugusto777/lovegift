@@ -40,16 +40,15 @@ export function formatDate(date: Date): string {
 }
 
 export function parseLocalDate(dateStr: string): Date {
-  const [y, m, d] = dateStr.split('T')[0].split('-').map(Number)
-  return new Date(y, m - 1, d)
+  return new Date(dateStr)
 }
 
 export function formatLocalDate(dateStr: string): string {
   if (!dateStr) return ''
-  const [y, m, d] = dateStr.split('T')[0].split('-').map(Number)
-  const months = [
-    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
-  ]
-  return `${d} de ${months[m - 1]} de ${y}`
+  return new Date(dateStr).toLocaleDateString('pt-BR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC'
+  })
 }
