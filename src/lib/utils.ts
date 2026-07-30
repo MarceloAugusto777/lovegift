@@ -47,9 +47,9 @@ export function parseLocalDate(dateStr: string): Date {
 export function formatLocalDate(dateStr: string): string {
   if (!dateStr) return ''
   const [y, m, d] = dateStr.split('T')[0].split('-').map(Number)
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  }).format(new Date(y, m - 1, d))
+  const months = [
+    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+  ]
+  return `${d} de ${months[m - 1]} de ${y}`
 }
