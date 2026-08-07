@@ -65,6 +65,7 @@ interface ProposalTemplateProps {
     accentColor: string
     fontFamily?: string
     dayCountStart: string
+    dayCountMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -521,7 +522,7 @@ function TimelineSection({ events, accentColor }: { events: TimelineEvent[]; acc
   )
 }
 
-function CounterSection({ daysCount, accentColor }: { daysCount: number; accentColor: string }) {
+function CounterSection({ daysCount, accentColor, message }: { daysCount: number; accentColor: string; message?: string }) {
   const [count, setCount] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
@@ -588,7 +589,7 @@ function CounterSection({ daysCount, accentColor }: { daysCount: number; accentC
           </motion.div>
 
           <motion.p variants={fadeUp} className="font-serif text-lg md:text-xl text-white/50 italic max-w-xl mx-auto">
-            E eu quero passar todos os dias que ainda virão ao seu lado
+            {message || "E eu quero passar todos os dias que ainda virão ao seu lado"}
           </motion.p>
         </motion.div>
       </div>
@@ -813,7 +814,7 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
 
       {renderQuote()}
 
-      <CounterSection daysCount={daysCount} accentColor={accentColor} />
+      <CounterSection daysCount={daysCount} accentColor={accentColor} message={gift.dayCountMessage} />
 
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />

@@ -35,6 +35,7 @@ export async function PUT(
     if (body.musicUrl !== undefined) updateData.musicUrl = body.musicUrl
     if (body.accentColor !== undefined) updateData.accentColor = body.accentColor
     if (body.fontFamily !== undefined) updateData.fontFamily = body.fontFamily
+    if (body.dayCountMessage !== undefined) updateData.dayCountMessage = body.dayCountMessage
     if (body.isPublished !== undefined) updateData.isPublished = body.isPublished
     if (body.senderName !== undefined) updateData.senderName = body.senderName
     if (body.clientName !== undefined) updateData.clientName = body.clientName

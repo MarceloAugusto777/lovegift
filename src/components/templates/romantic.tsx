@@ -65,6 +65,7 @@ interface RomanticTemplateProps {
     accentColor: string
     fontFamily?: string
     dayCountStart: string
+    dayCountMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -413,7 +414,7 @@ function TimelineSection({ events, accentColor }: { events: TimelineEvent[]; acc
   )
 }
 
-function CounterSection({ daysCount, accentColor }: { daysCount: number; accentColor: string }) {
+function CounterSection({ daysCount, accentColor, message }: { daysCount: number; accentColor: string; message?: string }) {
   const [count, setCount] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
@@ -479,7 +480,7 @@ function CounterSection({ daysCount, accentColor }: { daysCount: number; accentC
           </motion.div>
 
           <motion.p variants={fadeUp} className="font-serif text-xl text-white/60 italic max-w-xl mx-auto">
-            Cada dia ao seu lado é uma bênção que agradeço ao universo
+            {message || "Cada dia ao seu lado é uma bênção que agradeço ao universo"}
           </motion.p>
         </motion.div>
       </div>
@@ -705,7 +706,7 @@ export default function RomanticTemplate({ gift }: RomanticTemplateProps) {
 
       {renderQuote()}
 
-      <CounterSection daysCount={daysCount} accentColor={accentColor} />
+      <CounterSection daysCount={daysCount} accentColor={accentColor} message={gift.dayCountMessage} />
 
       {storySections.length > 0 && (
         <StorySection sections={storySections} accentColor={accentColor} />

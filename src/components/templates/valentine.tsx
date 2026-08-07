@@ -23,6 +23,7 @@ interface TemplateProps {
     accentColor: string
     fontFamily?: string
     dayCountStart: string
+    dayCountMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -718,9 +719,11 @@ function TimelineSection({ events }: { events: TimelineEvent[] }) {
 function DayCounterSection({
   dayCountStart,
   specialDate,
+  message,
 }: {
   dayCountStart: string
   specialDate: string
+  message?: string
 }) {
   const [daysCount, setDaysCount] = useState(0)
   const [count, setCount] = useState(0)
@@ -808,9 +811,8 @@ function DayCounterSection({
             className="font-serif text-xl text-white/50 italic max-w-xl mx-auto"
             style={{ fontFamily: FONT }}
           >
-            Cada dia ao seu lado é uma bênção que agradeço ao universo
+            {message || "Cada dia ao seu lado é uma bênção que agradeço ao universo"}
           </motion.p>
-
           <motion.div variants={fadeUp} className="grid grid-cols-2 gap-6 max-w-md mx-auto pt-6">
             <div
               className="rounded-2xl p-5 border"
@@ -1123,6 +1125,7 @@ export default function ValentineTemplate({ gift }: TemplateProps) {
       <DayCounterSection
         dayCountStart={gift.dayCountStart}
         specialDate={gift.specialDate}
+        message={gift.dayCountMessage}
       />
 
       {storySections.length > 0 && (

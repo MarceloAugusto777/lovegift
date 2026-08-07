@@ -19,6 +19,7 @@ interface TemplateProps {
     accentColor: string
     fontFamily?: string
     dayCountStart: string
+    dayCountMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -143,7 +144,7 @@ function OrnamentDivider({ inverted }: { inverted?: boolean }) {
   )
 }
 
-function HeroSection({ coupleName, specialDate, dayCountStart }: { coupleName: string; specialDate: string; dayCountStart: string }) {
+function HeroSection({ coupleName, specialDate, dayCountStart, dayCountMessage }: { coupleName: string; specialDate: string; dayCountStart: string; dayCountMessage?: string }) {
   const { scrollY } = useScroll()
   const opacity = useTransform(scrollY, [0, 600], [1, 0])
   const scale = useTransform(scrollY, [0, 600], [1, 1.1])
@@ -214,7 +215,7 @@ function HeroSection({ coupleName, specialDate, dayCountStart }: { coupleName: s
           >
             <Clock size={14} className="text-purple-400" />
             <span className="text-sm text-purple-600 font-light tracking-wide">
-              {daysTogether} days together
+              {dayCountMessage || `${daysTogether} days together`}
             </span>
           </motion.div>
         </motion.div>
@@ -449,7 +450,7 @@ function EventsTimeline({ events }: { events: TimelineEvent[] }) {
   )
 }
 
-function DayCounter({ dayCountStart }: { dayCountStart: string }) {
+function DayCounter({ dayCountStart, message }: { dayCountStart: string; message?: string }) {
   const { ref, isInView } = useScrollReveal(0.2)
   const [days, setDays] = useState(0)
 
@@ -501,7 +502,7 @@ function DayCounter({ dayCountStart }: { dayCountStart: string }) {
             transition={{ delay: 1 }}
             className="text-gray-400 text-sm mt-6 tracking-wider font-light"
           >
-            days since the beginning of forever
+            {message || "days since the beginning of forever"}
           </motion.p>
         </motion.div>
       </div>
@@ -652,6 +653,7 @@ export default function WeddingTemplate({ gift }: TemplateProps) {
         coupleName={gift.coupleName}
         specialDate={gift.specialDate}
         dayCountStart={gift.dayCountStart}
+        dayCountMessage={gift.dayCountMessage}
       />
 
       <OrnamentDivider />
@@ -680,7 +682,7 @@ export default function WeddingTemplate({ gift }: TemplateProps) {
 
       <OrnamentDivider />
 
-      <DayCounter dayCountStart={gift.dayCountStart} />
+      <DayCounter dayCountStart={gift.dayCountStart} message={gift.dayCountMessage} />
 
       <LocationSection url={gift.locationUrl} name={gift.locationName} />
 

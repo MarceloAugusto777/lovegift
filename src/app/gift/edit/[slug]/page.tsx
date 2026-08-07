@@ -153,6 +153,7 @@ export default function GiftEditPage() {
   const [fontFamily, setFontFamily] = useState("Playfair Display")
   const [templateId, setTemplateId] = useState("romantic")
   const [dayCountStart, setDayCountStart] = useState("")
+  const [dayCountMessage, setDayCountMessage] = useState("")
 
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | null>(null)
@@ -208,6 +209,7 @@ export default function GiftEditPage() {
       setFontFamily(g.fontFamily || "Playfair Display")
       setTemplateId(g.template?.slug || "romantic")
       setDayCountStart(g.dayCountStart || g.specialDate || "")
+      setDayCountMessage(g.dayCountMessage || "")
 
       try {
         setPhotos(typeof g.photos === "string" ? JSON.parse(g.photos) : g.photos || [])
@@ -229,6 +231,7 @@ export default function GiftEditPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
+      const { newPhotos, newStory, newTimeline } = await recompressEverything()
       const payload = {
         coupleName,
         specialDate,
@@ -239,24 +242,31 @@ export default function GiftEditPage() {
         locationName,
         locationUrl,
         musicUrl,
-        photos,
+        photos: newPhotos,
         loveQuotes,
-        storySections,
-        timelineEvents,
+        storySections: newStory,
+        timelineEvents: newTimeline,
         accentColor,
         fontFamily,
         templateId,
         dayCountStart,
+        dayCountMessage,
       }
       const res = await fetch(`/api/gifts/${slug}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-      if (!res.ok) throw new Error("Erro ao salvar")
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || "Erro ao salvar")
+      }
+      setPhotos(newPhotos)
+      setStorySections(newStory)
+      setTimelineEvents(newTimeline)
       setHasChanges(false)
     } catch {
-      alert("Erro ao salvar. Tente novamente.")
+      alert("Erro ao salvar. O número de fotos pode ser grande demais; tente remover algumas ou reduzir o tamanho.")
     } finally {
       setSaving(false)
     }
@@ -282,11 +292,10 @@ export default function GiftEditPage() {
 
   const markChanged = () => setHasChanges(true)
 
-  const compressImage = async (dataUrl: string): Promise<string> => {
+  const compressImage = async (dataUrl: string, maxW = 1000, quality = 0.75): Promise<string> => {
     const img = new Image()
     return new Promise((resolve, reject) => {
       img.onload = () => {
-        const maxW = 1200
         let { width, height } = img
         if (width > maxW) {
           height = height * (maxW / width)
@@ -297,11 +306,43 @@ export default function GiftEditPage() {
         canvas.height = height
         const ctx = canvas.getContext('2d')!
         ctx.drawImage(img, 0, 0, width, height)
-        resolve(canvas.toDataURL('image/jpeg', 0.88))
+        resolve(canvas.toDataURL('image/jpeg', quality))
       }
       img.onerror = reject
       img.src = dataUrl
     })
+  }
+
+  const recompressIfDataUrl = async (url: string | undefined | null): Promise<string | undefined> => {
+    if (url && url.startsWith('data:image/')) {
+      return compressImage(url, 1000, 0.75)
+    }
+    return url || undefined
+  }
+
+  const recompressPhotoList = async (list: string[]): Promise<string[]> => {
+    const out: string[] = []
+    for (const url of list) {
+      const compressed = await recompressIfDataUrl(url)
+      if (compressed) out.push(compressed)
+    }
+    return out
+  }
+
+  const recompressEverything = async () => {
+    const newPhotos = await recompressPhotoList(photos)
+    const newStory: StorySection[] = []
+    for (const s of storySections) {
+      const photosCompressed = await recompressPhotoList(s.photos || [])
+      const photoCompressed = await recompressIfDataUrl(s.photo)
+      newStory.push({ ...s, photo: photoCompressed || "", photos: photosCompressed })
+    }
+    const newTimeline: TimelineEvent[] = []
+    for (const e of timelineEvents) {
+      const photoCompressed = await recompressIfDataUrl(e.photo)
+      newTimeline.push({ ...e, photo: photoCompressed || "" })
+    }
+    return { newPhotos, newStory, newTimeline }
   }
 
   const uploadPhoto = async (dataUrl: string): Promise<string | null> => {
@@ -598,6 +639,18 @@ export default function GiftEditPage() {
             value={dayCountStart}
             onChange={(e) => { setDayCountStart(e.target.value); markChanged() }}
           />
+        </div>
+        <div style={{ marginBottom: "14px" }}>
+          <label style={labelStyle}>Mensagem do Contador</label>
+          <input
+            style={inputStyle}
+            value={dayCountMessage}
+            onChange={(e) => { setDayCountMessage(e.target.value); markChanged() }}
+            placeholder="Cada dia ao seu lado e uma bencao que agradeco ao universo"
+          />
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", marginTop: "6px", lineHeight: "1.4" }}>
+            Frase exibida abaixo do contador. Deixe vazio para usar a frase padrao.
+          </p>
         </div>
         {dayCountStart && (
           <div style={{

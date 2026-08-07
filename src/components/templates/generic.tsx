@@ -29,6 +29,7 @@ interface TemplateProps {
     accentColor: string
     fontFamily?: string
     dayCountStart: string
+    dayCountMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -365,6 +366,18 @@ export default function GenericTemplate({ gift }: TemplateProps) {
               dias
             </motion.p>
           </motion.div>
+
+          {gift.dayCountMessage && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="font-serif text-white/50 italic text-lg md:text-xl mt-10 max-w-xl mx-auto"
+            >
+              {gift.dayCountMessage}
+            </motion.p>
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}

@@ -19,6 +19,7 @@ interface GiftData {
   musicUrl: string
   accentColor: string
   fontFamily: string
+  dayCountMessage?: string
   templateId: string
   senderName?: string
   clientName?: string

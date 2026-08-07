@@ -39,6 +39,7 @@ model Gift {
   
   accentColor   String   @default("#e11d48")
   fontFamily    String   @default("serif")
+  dayCountMessage String @default("")
   
   senderName    String?
   clientName    String?
