@@ -50,7 +50,6 @@ export default function ConstellationViewer({
   onClose,
 }: ConstellationViewerProps) {
   const skyRef = useRef<HTMLDivElement>(null)
-  const [placed, setPlaced] = useState<boolean[]>([])
   const [flyers, setFlyers] = useState<Flyer[]>([])
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [flash, setFlash] = useState<number | null>(null)
@@ -58,8 +57,20 @@ export default function ConstellationViewer({
 
   const photosToUse = useMemo(() => photos.slice(0, 24), [photos])
   const points = useMemo(() => heartPoints(photosToUse.length), [photosToUse.length])
+  const [placed, setPlaced] = useState<boolean[]>(() => Array(photosToUse.length).fill(false))
 
   const allPlaced = placed.length > 0 && placed.every(Boolean)
+
+  useEffect(() => {
+    if (placed.length === photosToUse.length) return
+    setPlaced((prev) => {
+      const next = Array(photosToUse.length).fill(false)
+      prev.forEach((v, i) => {
+        if (i < next.length && v) next[i] = true
+      })
+      return next
+    })
+  }, [photosToUse.length, placed.length])
 
   useEffect(() => {
     const measure = () => {
