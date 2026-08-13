@@ -53,6 +53,10 @@ Botões de reação (curti, chorei, amei) no final da página.
 ## [PENDENTE] 14. Contador de visitas
 Mostrar que o presenteado visitou (ex.: "essa página já foi aberta X vezes").
 
+## [FECHADA] 14. Tela de abertura
+Cartinha fechada ao abrir o link: "Olha o que fulano preparou para você" com
+botão "Abrir presente". Envelope abre + corações voam e revela o site.
+
 ---
 
 # Interação do presenteado

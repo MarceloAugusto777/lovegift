@@ -88,6 +88,8 @@ interface GiftData {
   surpriseTitle: string
   surpriseText: string
   surprisePhoto: string
+  welcomeEnabled: boolean
+  welcomeMessage: string
   template?: { slug: string; name: string }
 }
 
@@ -186,6 +188,8 @@ export default function GiftEditPage() {
   const [surpriseTitle, setSurpriseTitle] = useState("")
   const [surpriseText, setSurpriseText] = useState("")
   const [surprisePhoto, setSurprisePhoto] = useState("")
+  const [welcomeEnabled, setWelcomeEnabled] = useState(false)
+  const [welcomeMessage, setWelcomeMessage] = useState("")
 
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | { type: 'surprise' } | null>(null)
@@ -254,6 +258,8 @@ export default function GiftEditPage() {
       setSurpriseTitle(g.surpriseTitle || "")
       setSurpriseText(g.surpriseText || "")
       setSurprisePhoto(g.surprisePhoto || "")
+      setWelcomeEnabled(!!g.welcomeEnabled)
+      setWelcomeMessage(g.welcomeMessage || "")
 
       try {
         setPhotos(typeof g.photos === "string" ? JSON.parse(g.photos) : g.photos || [])
@@ -305,6 +311,8 @@ export default function GiftEditPage() {
         surpriseTitle,
         surpriseText,
         surprisePhoto,
+        welcomeEnabled,
+        welcomeMessage,
       }
       const res = await fetch(`/api/gifts/${slug}`, {
         method: "PUT",
@@ -748,6 +756,40 @@ export default function GiftEditPage() {
             placeholder="Nossa Historia de Amor"
           />
         </div>
+      </div>
+
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+          <Sparkles size={18} color={accentColor} />
+          <h3 style={{ color: "#fff", margin: 0, fontSize: "16px" }}>Tela de Abertura</h3>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 16px", lineHeight: 1.6 }}>
+          Mostra uma cartinha fechada com a frase "Olha o que fulano preparou para voce".
+          Quem abre o link desembrulha o presente com um clique.
+        </p>
+        <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={welcomeEnabled}
+            onChange={(e) => { setWelcomeEnabled(e.target.checked); markChanged() }}
+            style={{ width: "18px", height: "18px", accentColor }}
+          />
+          Ativar tela de abertura
+        </label>
+        {welcomeEnabled && (
+          <div style={{ marginTop: "14px" }}>
+            <label style={labelStyle}>Mensagem (opcional)</label>
+            <input
+              style={inputStyle}
+              value={welcomeMessage}
+              onChange={(e) => { setWelcomeMessage(e.target.value); markChanged() }}
+              placeholder="Olha o que Fulano preparou para voce"
+            />
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", marginTop: "6px", lineHeight: "1.4" }}>
+              Deixe vazio para usar o nome do remetente automaticamente.
+            </p>
+          </div>
+        )}
       </div>
 
       <div style={cardStyle}>

@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { templates, type TemplateId } from '@/components/templates'
 import MusicPlayer from '@/components/music-player'
+import IntroScreen from '@/components/intro-screen'
 
 interface GiftData {
   coupleName: string
@@ -30,6 +31,8 @@ interface GiftData {
   surpriseTitle: string
   surpriseText: string
   surprisePhoto: string
+  welcomeEnabled: boolean
+  welcomeMessage: string
   templateId: string
   senderName?: string
   clientName?: string
@@ -49,6 +52,7 @@ export default function GiftPage() {
   const [gift, setGift] = useState<GiftData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [introDone, setIntroDone] = useState(false)
 
   const loadGift = useCallback(async () => {
     try {
@@ -124,7 +128,26 @@ export default function GiftPage() {
         <MusicPlayer musicUrl={gift.musicUrl} accentColor={gift.accentColor} />
       )}
 
-      <TemplateComponent gift={gift} />
+      <AnimatePresence>
+        {gift.welcomeEnabled && !introDone && (
+          <IntroScreen
+            senderName={gift.senderName}
+            welcomeMessage={gift.welcomeMessage}
+            coupleName={gift.coupleName}
+            accentColor={gift.accentColor}
+            fontFamily={gift.fontFamily}
+            onOpen={() => setIntroDone(true)}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: gift.welcomeEnabled ? 0.9 : 0 }}
+      >
+        <TemplateComponent gift={gift} />
+      </motion.div>
     </main>
   )
 }

@@ -53,6 +53,8 @@ export async function PUT(
     if (body.surpriseTitle !== undefined) updateData.surpriseTitle = body.surpriseTitle
     if (body.surpriseText !== undefined) updateData.surpriseText = body.surpriseText
     if (body.surprisePhoto !== undefined) updateData.surprisePhoto = body.surprisePhoto
+    if (body.welcomeEnabled !== undefined) updateData.welcomeEnabled = body.welcomeEnabled
+    if (body.welcomeMessage !== undefined) updateData.welcomeMessage = body.welcomeMessage
     if (body.templateId !== undefined) {
       const template = await prisma.template.findUnique({ where: { slug: body.templateId } })
       if (template) updateData.templateId = template.id

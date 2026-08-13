@@ -53,6 +53,9 @@ model Gift {
   surpriseText      String  @default("")
   surprisePhoto     String  @default("")
   
+  welcomeEnabled  Boolean @default(false)
+  welcomeMessage  String  @default("")
+  
   senderName    String?
   clientName    String?
   storyTitle    String?
