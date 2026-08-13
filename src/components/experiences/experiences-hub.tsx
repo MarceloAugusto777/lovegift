@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Gamepad2, Camera, Sparkles } from 'lucide-react'
+import { Heart, Gamepad2, Camera, Sparkles, Star } from 'lucide-react'
 import HeartCatchGame from './heart-catch-game'
 import PolaroidViewer from './polaroid-viewer'
+import ConstellationViewer from './constellation-viewer'
+import { collectPhotos } from './collect-photos'
 
 export interface ExperiencesHubGift {
   coupleName: string
@@ -20,51 +22,21 @@ export interface ExperiencesHubGift {
   polaroidEnabled: boolean
   polaroidTitle: string
   polaroidMessage: string
-}
-
-function collectPolaroidPhotos(gift: ExperiencesHubGift): string[] {
-  const all: string[] = []
-  const push = (u?: string) => {
-    if (u && typeof u === 'string' && u.startsWith('data:image') && !all.includes(u)) all.push(u)
-    if (u && typeof u === 'string' && u.startsWith('http') && !all.includes(u)) all.push(u)
-  }
-  try {
-    const gallery = JSON.parse(gift.photos)
-    if (Array.isArray(gallery)) gallery.forEach((p) => push(p))
-  } catch {
-    /* ignore */
-  }
-  try {
-    const sections = JSON.parse(gift.storySections)
-    if (Array.isArray(sections)) {
-      sections.forEach((s: { photo?: string; photos?: string[] }) => {
-        push(s.photo)
-        if (Array.isArray(s.photos)) s.photos.forEach((p) => push(p))
-      })
-    }
-  } catch {
-    /* ignore */
-  }
-  try {
-    const events = JSON.parse(gift.timelineEvents)
-    if (Array.isArray(events)) {
-      events.forEach((e: { photo?: string }) => push(e.photo))
-    }
-  } catch {
-    /* ignore */
-  }
-  return all
+  constellationEnabled: boolean
+  constellationTitle: string
+  constellationMessage: string
 }
 
 export default function ExperiencesHub({ gift }: { gift: ExperiencesHubGift }) {
-  const [active, setActive] = useState<'game' | 'polaroid' | null>(null)
+  const [active, setActive] = useState<'game' | 'polaroid' | 'constellation' | null>(null)
 
   const gameOn = gift.miniGameEnabled
   const polaroidOn = gift.polaroidEnabled
+  const constellationOn = gift.constellationEnabled
 
-  if (!gameOn && !polaroidOn) return null
+  if (!gameOn && !polaroidOn && !constellationOn) return null
 
-  const photos = collectPolaroidPhotos(gift)
+  const photos = collectPhotos(gift.photos, gift.storySections, gift.timelineEvents)
 
   const color = gift.accentColor
   const fontFamily = gift.fontFamily || 'serif'
@@ -107,7 +79,7 @@ export default function ExperiencesHub({ gift }: { gift: ExperiencesHubGift }) {
           {gift.coupleName ? `${gift.coupleName} — experiências para você` : 'Experiências para você'}
         </p>
 
-        <div className="grid md:grid-cols-2 gap-5 max-w-2xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-3xl mx-auto">
           {gameOn && (
             <motion.button
               whileHover={{ scale: 1.03, y: -4 }}
@@ -163,6 +135,35 @@ export default function ExperiencesHub({ gift }: { gift: ExperiencesHubGift }) {
               </span>
             </motion.button>
           )}
+
+          {constellationOn && (
+            <motion.button
+              whileHover={{ scale: 1.03, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setActive('constellation')}
+              className="rounded-2xl p-8 text-left cursor-pointer"
+              style={{
+                background: `linear-gradient(150deg, ${color}22 0%, rgba(255,255,255,0.04) 100%)`,
+                border: `1px solid ${color}44`,
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+                style={{ background: `${color}33` }}
+              >
+                <Star size={24} color={color} />
+              </div>
+              <h3 className="text-white text-xl font-serif mb-2">
+                {gift.constellationTitle || 'Constelação do Amor'}
+              </h3>
+              <p className="text-white/45 text-sm leading-relaxed">
+                Toque em cada momento e acenda as estrelas que formam a nossa constelação. ✨
+              </p>
+              <span className="inline-flex items-center gap-1.5 mt-5 text-sm font-semibold" style={{ color }}>
+                Acender <span>→</span>
+              </span>
+            </motion.button>
+          )}
         </div>
 
         <p className="text-white/25 text-xs mt-12 flex items-center justify-center gap-1.5">
@@ -190,6 +191,17 @@ export default function ExperiencesHub({ gift }: { gift: ExperiencesHubGift }) {
             coupleName={gift.coupleName}
             title={gift.polaroidTitle}
             message={gift.polaroidMessage}
+            onClose={() => setActive(null)}
+          />
+        )}
+        {active === 'constellation' && (
+          <ConstellationViewer
+            photos={photos}
+            accentColor={color}
+            fontFamily={gift.fontFamily}
+            coupleName={gift.coupleName}
+            title={gift.constellationTitle}
+            message={gift.constellationMessage}
             onClose={() => setActive(null)}
           />
         )}

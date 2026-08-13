@@ -36,6 +36,7 @@ import {
   Gift,
   Gamepad2,
   Camera,
+  Star,
 } from "lucide-react"
 
 interface StorySection {
@@ -101,6 +102,9 @@ interface GiftData {
   polaroidEnabled: boolean
   polaroidTitle: string
   polaroidMessage: string
+  constellationEnabled: boolean
+  constellationTitle: string
+  constellationMessage: string
   template?: { slug: string; name: string }
 }
 
@@ -210,6 +214,9 @@ export default function GiftEditPage() {
   const [polaroidEnabled, setPolaroidEnabled] = useState(false)
   const [polaroidTitle, setPolaroidTitle] = useState("")
   const [polaroidMessage, setPolaroidMessage] = useState("")
+  const [constellationEnabled, setConstellationEnabled] = useState(false)
+  const [constellationTitle, setConstellationTitle] = useState("")
+  const [constellationMessage, setConstellationMessage] = useState("")
 
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | { type: 'surprise' } | null>(null)
@@ -288,6 +295,9 @@ export default function GiftEditPage() {
       setPolaroidEnabled(!!g.polaroidEnabled)
       setPolaroidTitle(g.polaroidTitle || "")
       setPolaroidMessage(g.polaroidMessage || "")
+      setConstellationEnabled(!!g.constellationEnabled)
+      setConstellationTitle(g.constellationTitle || "")
+      setConstellationMessage(g.constellationMessage || "")
 
       try {
         setPhotos(typeof g.photos === "string" ? JSON.parse(g.photos) : g.photos || [])
@@ -349,6 +359,9 @@ export default function GiftEditPage() {
         polaroidEnabled,
         polaroidTitle,
         polaroidMessage,
+        constellationEnabled,
+        constellationTitle,
+        constellationMessage,
       }
       const res = await fetch(`/api/gifts/${slug}`, {
         method: "PUT",
@@ -1954,6 +1967,50 @@ export default function GiftEditPage() {
                 value={polaroidMessage}
                 onChange={(e) => { setPolaroidMessage(e.target.value); markChanged() }}
                 placeholder="Ex.: Toque nas fotos e relembre cada momento nosso..."
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+          <Star size={18} color={accentColor} />
+          <h3 style={{ color: "#fff", margin: 0, fontSize: "16px" }}>Constelação do Amor</h3>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 16px", lineHeight: 1.6 }}>
+          As fotos do presente (abas <strong style={{ color: "#fff" }}>Fotos</strong>,{" "}
+          <strong style={{ color: "#fff" }}>Historia</strong> e <strong style={{ color: "#fff" }}>Timeline</strong>)
+          ficam espalhadas no céu. Toque em cada momento para acender a estrela e, ao completar,
+          os pontos se conectam formando um <strong style={{ color: "#fff" }}>coração</strong>.
+        </p>
+        <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={constellationEnabled}
+            onChange={(e) => { setConstellationEnabled(e.target.checked); markChanged() }}
+            style={{ width: "18px", height: "18px", accentColor }}
+          />
+          Ativar Constelação do Amor
+        </label>
+        {constellationEnabled && (
+          <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div>
+              <label style={labelStyle}>Titulo (opcional)</label>
+              <input
+                style={inputStyle}
+                value={constellationTitle}
+                onChange={(e) => { setConstellationTitle(e.target.value); markChanged() }}
+                placeholder="Ex.: A Constelação do Nosso Amor"
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Mensagem final (opcional)</label>
+              <textarea
+                style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }}
+                value={constellationMessage}
+                onChange={(e) => { setConstellationMessage(e.target.value); markChanged() }}
+                placeholder="Ex.: Cada estrela acesa é um momento nosso que brilha para sempre no céu."
               />
             </div>
           </div>

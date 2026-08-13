@@ -63,6 +63,9 @@ export async function PUT(
     if (body.polaroidEnabled !== undefined) updateData.polaroidEnabled = body.polaroidEnabled
     if (body.polaroidTitle !== undefined) updateData.polaroidTitle = body.polaroidTitle
     if (body.polaroidMessage !== undefined) updateData.polaroidMessage = body.polaroidMessage
+    if (body.constellationEnabled !== undefined) updateData.constellationEnabled = body.constellationEnabled
+    if (body.constellationTitle !== undefined) updateData.constellationTitle = body.constellationTitle
+    if (body.constellationMessage !== undefined) updateData.constellationMessage = body.constellationMessage
     if (body.templateId !== undefined) {
       const template = await prisma.template.findUnique({ where: { slug: body.templateId } })
       if (template) updateData.templateId = template.id

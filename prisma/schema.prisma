@@ -66,6 +66,10 @@ model Gift {
   polaroidTitle   String  @default("")
   polaroidMessage String  @default("")
   
+  constellationEnabled  Boolean @default(false)
+  constellationTitle    String  @default("")
+  constellationMessage  String  @default("")
+  
   senderName    String?
   clientName    String?
   storyTitle    String?

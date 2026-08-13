@@ -42,6 +42,9 @@ interface GiftData {
   polaroidEnabled: boolean
   polaroidTitle: string
   polaroidMessage: string
+  constellationEnabled: boolean
+  constellationTitle: string
+  constellationMessage: string
   templateId: string
   senderName?: string
   clientName?: string
@@ -172,6 +175,9 @@ export default function GiftPage() {
             polaroidEnabled: !!gift.polaroidEnabled,
             polaroidTitle: gift.polaroidTitle || '',
             polaroidMessage: gift.polaroidMessage || '',
+            constellationEnabled: !!gift.constellationEnabled,
+            constellationTitle: gift.constellationTitle || '',
+            constellationMessage: gift.constellationMessage || '',
           }}
         />
       </motion.div>
