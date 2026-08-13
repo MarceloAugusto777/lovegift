@@ -20,6 +20,9 @@ interface GiftData {
   accentColor: string
   fontFamily: string
   dayCountMessage?: string
+  quiz: string
+  quizEnabled: boolean
+  quizFinalMessage: string
   templateId: string
   senderName?: string
   clientName?: string

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import PhotoDisplay from '@/components/photo-display'
+import QuizSection from '@/components/templates/quiz-section'
 import { formatLocalDate, parseLocalDate } from '@/lib/utils'
 
 const sectionVariants = {
@@ -66,6 +67,9 @@ interface ProposalTemplateProps {
     fontFamily?: string
     dayCountStart: string
     dayCountMessage?: string
+    quiz?: string
+    quizEnabled?: boolean
+    quizFinalMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -831,6 +835,14 @@ export default function ProposalTemplate({ gift }: ProposalTemplateProps) {
       <RingMoment accentColor={accentColor} />
 
       <PhotosSection photos={photos} accentColor={accentColor} />
+
+      <QuizSection
+        quiz={gift.quiz || "[]"}
+        quizEnabled={!!gift.quizEnabled}
+        quizFinalMessage={gift.quizFinalMessage}
+        accentColor={accentColor}
+        fontFamily={fontFamily}
+      />
 
       <LocationSection
         locationUrl={gift.locationUrl}

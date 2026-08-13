@@ -14,6 +14,7 @@ import {
   ChevronDown,
 } from "lucide-react"
 import PhotoDisplay from "@/components/photo-display"
+import QuizSection from "@/components/templates/quiz-section"
 import { formatLocalDate, parseLocalDate } from "@/lib/utils"
 
 interface TemplateProps {
@@ -30,6 +31,9 @@ interface TemplateProps {
     fontFamily?: string
     dayCountStart: string
     dayCountMessage?: string
+    quiz?: string
+    quizEnabled?: boolean
+    quizFinalMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -583,6 +587,14 @@ export default function GenericTemplate({ gift }: TemplateProps) {
           </div>
         </motion.div>
       )}
+
+      <QuizSection
+        quiz={gift.quiz || "[]"}
+        quizEnabled={!!gift.quizEnabled}
+        quizFinalMessage={gift.quizFinalMessage}
+        accentColor={color}
+        fontFamily={fontFamily}
+      />
 
       {loveQuotes.slice(quoteIndex).map((q, i) => (
         <div key={i} style={{

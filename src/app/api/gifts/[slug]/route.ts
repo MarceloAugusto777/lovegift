@@ -43,6 +43,9 @@ export async function PUT(
     if (body.storySections !== undefined) updateData.storySections = JSON.stringify(body.storySections)
     if (body.timelineEvents !== undefined) updateData.timelineEvents = JSON.stringify(body.timelineEvents)
     if (body.dayCountStart !== undefined) updateData.dayCountStart = body.dayCountStart
+    if (body.quiz !== undefined) updateData.quiz = JSON.stringify(body.quiz)
+    if (body.quizEnabled !== undefined) updateData.quizEnabled = body.quizEnabled
+    if (body.quizFinalMessage !== undefined) updateData.quizFinalMessage = body.quizFinalMessage
     if (body.templateId !== undefined) {
       const template = await prisma.template.findUnique({ where: { slug: body.templateId } })
       if (template) updateData.templateId = template.id

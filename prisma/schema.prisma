@@ -41,6 +41,10 @@ model Gift {
   fontFamily    String   @default("serif")
   dayCountMessage String @default("")
   
+  quiz          String   @default("[]")
+  quizEnabled   Boolean  @default(false)
+  quizFinalMessage String @default("")
+  
   senderName    String?
   clientName    String?
   storyTitle    String?

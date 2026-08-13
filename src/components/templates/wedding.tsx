@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { Heart, Calendar, MapPin, Music, Clock, Sparkles, ChevronDown, BookOpen, Film } from 'lucide-react'
 import { formatLocalDate, parseLocalDate } from '@/lib/utils'
 import PhotoDisplay from '@/components/photo-display'
+import QuizSection from '@/components/templates/quiz-section'
 
 interface TemplateProps {
   gift: {
@@ -20,6 +21,9 @@ interface TemplateProps {
     fontFamily?: string
     dayCountStart: string
     dayCountMessage?: string
+    quiz?: string
+    quizEnabled?: boolean
+    quizFinalMessage?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -683,6 +687,14 @@ export default function WeddingTemplate({ gift }: TemplateProps) {
       <OrnamentDivider />
 
       <DayCounter dayCountStart={gift.dayCountStart} message={gift.dayCountMessage} />
+
+      <QuizSection
+        quiz={gift.quiz || "[]"}
+        quizEnabled={!!gift.quizEnabled}
+        quizFinalMessage={gift.quizFinalMessage}
+        accentColor={accentColor}
+        fontFamily={fontFamily}
+      />
 
       <LocationSection url={gift.locationUrl} name={gift.locationName} />
 

@@ -30,6 +30,8 @@ import {
   PenLine,
   ChevronUp,
   ChevronDown,
+  ListChecks,
+  Check,
 } from "lucide-react"
 
 interface StorySection {
@@ -45,6 +47,13 @@ interface TimelineEvent {
   title: string
   description: string
   photo: string
+}
+
+interface QuizQuestion {
+  question: string
+  options: string[]
+  correctIndex: number
+  feedback?: string
 }
 
 interface GiftData {
@@ -68,10 +77,13 @@ interface GiftData {
   storyTitle: string
   storySections: StorySection[]
   timelineEvents: TimelineEvent[]
+  quiz: QuizQuestion[]
+  quizEnabled: boolean
+  quizFinalMessage: string
   template?: { slug: string; name: string }
 }
 
-type TabId = "info" | "fotos" | "historia" | "timeline" | "citacoes" | "estilo" | "preview"
+type TabId = "info" | "fotos" | "historia" | "timeline" | "citacoes" | "quiz" | "estilo" | "preview"
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "info", label: "Info", icon: <Type size={18} /> },
@@ -79,6 +91,7 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "historia", label: "Historia", icon: <BookOpen size={18} /> },
   { id: "timeline", label: "Timeline", icon: <Clock size={18} /> },
   { id: "citacoes", label: "Citacoes", icon: <Quote size={18} /> },
+  { id: "quiz", label: "Quiz", icon: <ListChecks size={18} /> },
   { id: "estilo", label: "Estilo", icon: <Palette size={18} /> },
   { id: "preview", label: "Preview", icon: <Eye size={18} /> },
 ]
@@ -154,6 +167,9 @@ export default function GiftEditPage() {
   const [templateId, setTemplateId] = useState("romantic")
   const [dayCountStart, setDayCountStart] = useState("")
   const [dayCountMessage, setDayCountMessage] = useState("")
+  const [quizEnabled, setQuizEnabled] = useState(false)
+  const [quiz, setQuiz] = useState<QuizQuestion[]>([])
+  const [quizFinalMessage, setQuizFinalMessage] = useState("")
 
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | null>(null)
@@ -210,6 +226,11 @@ export default function GiftEditPage() {
       setTemplateId(g.template?.slug || "romantic")
       setDayCountStart(g.dayCountStart || g.specialDate || "")
       setDayCountMessage(g.dayCountMessage || "")
+      setQuizEnabled(!!g.quizEnabled)
+      setQuizFinalMessage(g.quizFinalMessage || "")
+      try {
+        setQuiz(typeof g.quiz === "string" ? JSON.parse(g.quiz) : g.quiz || [])
+      } catch { setQuiz([]) }
 
       try {
         setPhotos(typeof g.photos === "string" ? JSON.parse(g.photos) : g.photos || [])
@@ -251,6 +272,9 @@ export default function GiftEditPage() {
         templateId,
         dayCountStart,
         dayCountMessage,
+        quiz,
+        quizEnabled,
+        quizFinalMessage,
       }
       const res = await fetch(`/api/gifts/${slug}`, {
         method: "PUT",
@@ -533,6 +557,64 @@ export default function GiftEditPage() {
     markChanged()
   }
 
+  const addQuestion = () => {
+    setQuiz((prev) => [...prev, { question: "", options: ["", ""], correctIndex: 0, feedback: "" }])
+    markChanged()
+  }
+
+  const updateQuestion = (index: number, field: keyof QuizQuestion, value: string | number) => {
+    setQuiz((prev) => prev.map((q, i) => (i === index ? { ...q, [field]: value } : q)))
+    markChanged()
+  }
+
+  const updateOption = (qIndex: number, oIndex: number, value: string) => {
+    setQuiz((prev) =>
+      prev.map((q, i) =>
+        i === qIndex ? { ...q, options: q.options.map((o, j) => (j === oIndex ? value : o)) } : q
+      )
+    )
+    markChanged()
+  }
+
+  const addOption = (qIndex: number) => {
+    setQuiz((prev) =>
+      prev.map((q, i) =>
+        i === qIndex && q.options.length < 4 ? { ...q, options: [...q.options, ""] } : q
+      )
+    )
+    markChanged()
+  }
+
+  const removeOption = (qIndex: number, oIndex: number) => {
+    setQuiz((prev) =>
+      prev.map((q, i) => {
+        if (i !== qIndex) return q
+        const options = q.options.filter((_, j) => j !== oIndex)
+        const correctIndex = q.correctIndex === oIndex ? 0 : q.correctIndex > oIndex ? q.correctIndex - 1 : q.correctIndex
+        return { ...q, options, correctIndex }
+      })
+    )
+    markChanged()
+  }
+
+  const moveQuestion = (index: number, dir: -1 | 1) => {
+    setQuiz((prev) => {
+      const target = index + dir
+      if (target < 0 || target >= prev.length) return prev
+      const next = [...prev]
+      const [item] = next.splice(index, 1)
+      next.splice(target, 0, item)
+      return next
+    })
+    markChanged()
+  }
+
+  const removeQuestion = (index: number) => {
+    if (!confirm("Tem certeza que deseja remover esta pergunta?")) return
+    setQuiz((prev) => prev.filter((_, i) => i !== index))
+    markChanged()
+  }
+
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "12px 14px",
@@ -547,8 +629,7 @@ export default function GiftEditPage() {
   }
 
   const labelStyle: React.CSSProperties = {
-    display: "block",
-    color: "rgba(255,255,255,0.7)",
+    display: "block",    color: "rgba(255,255,255,0.7)",
     fontSize: "13px",
     fontWeight: "500",
     marginBottom: "6px",
@@ -562,6 +643,20 @@ export default function GiftEditPage() {
     borderRadius: "14px",
     padding: "20px",
     marginBottom: "16px",
+  }
+
+  const iconBtnStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.08)",
+    border: "none",
+    borderRadius: "8px",
+    padding: "8px",
+    color: "rgba(255,255,255,0.6)",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "34px",
+    height: "34px",
   }
 
   const renderInfoTab = () => {
@@ -1288,6 +1383,181 @@ export default function GiftEditPage() {
     </div>
   )
 
+  const renderQuizTab = () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+          <ListChecks size={18} color={accentColor} />
+          <h3 style={{ color: "#fff", margin: 0, fontSize: "16px" }}>Quiz do Casal</h3>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 16px", lineHeight: 1.6 }}>
+          Crie perguntas de múltipla escolha. O presenteado responde e vê a pontuacao no final.
+        </p>
+        <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={quizEnabled}
+            onChange={(e) => { setQuizEnabled(e.target.checked); markChanged() }}
+            style={{ width: "18px", height: "18px", accentColor }}
+          />
+          Ativar quiz neste presente
+        </label>
+      </div>
+
+      {quizEnabled && (
+        <>
+          <div style={cardStyle}>
+            <label style={labelStyle}>Mensagem final (aparece depois que o presenteado responder)</label>
+            <textarea
+              style={{ ...inputStyle, minHeight: "70px", resize: "vertical" }}
+              value={quizFinalMessage}
+              onChange={(e) => { setQuizFinalMessage(e.target.value); markChanged() }}
+              placeholder="Ex.: Voce me conhece tao bem... te amo demais!"
+            />
+          </div>
+
+          {quiz.map((q, qIndex) => (
+            <div key={qIndex} style={cardStyle}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                <span
+                  style={{
+                    background: `${accentColor}22`,
+                    color: accentColor,
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    borderRadius: "8px",
+                    padding: "4px 10px",
+                  }}
+                >
+                  Pergunta {qIndex + 1}
+                </span>
+                <div style={{ marginLeft: "auto", display: "flex", gap: "6px" }}>
+                  <button
+                    onClick={() => moveQuestion(qIndex, -1)}
+                    disabled={qIndex === 0}
+                    style={iconBtnStyle}
+                  >
+                    <ChevronUp size={16} />
+                  </button>
+                  <button
+                    onClick={() => moveQuestion(qIndex, 1)}
+                    disabled={qIndex === quiz.length - 1}
+                    style={iconBtnStyle}
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                  <button onClick={() => removeQuestion(qIndex)} style={{ ...iconBtnStyle, color: "#f87171" }}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+
+              <label style={labelStyle}>Pergunta</label>
+              <input
+                style={inputStyle}
+                value={q.question}
+                onChange={(e) => updateQuestion(qIndex, "question", e.target.value)}
+                placeholder="Ex.: Qual a nossa primeira musica?"
+              />
+
+              <label style={{ ...labelStyle, marginTop: "14px" }}>Alternativas</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {q.options.map((opt, oIndex) => (
+                  <div key={oIndex} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <button
+                      onClick={() => updateQuestion(qIndex, "correctIndex", oIndex)}
+                      title="Marcar como resposta certa"
+                      style={{
+                        background: q.correctIndex === oIndex ? accentColor : "rgba(255,255,255,0.06)",
+                        border: q.correctIndex === oIndex ? "none" : "1px solid rgba(255,255,255,0.12)",
+                        borderRadius: "8px",
+                        padding: "8px",
+                        color: q.correctIndex === oIndex ? "#fff" : "rgba(255,255,255,0.4)",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        flexShrink: 0,
+                        width: "34px",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Check size={15} />
+                    </button>
+                    <input
+                      style={inputStyle}
+                      value={opt}
+                      onChange={(e) => updateOption(qIndex, oIndex, e.target.value)}
+                      placeholder={`Alternativa ${oIndex + 1}`}
+                    />
+                    {q.options.length > 2 && (
+                      <button
+                        onClick={() => removeOption(qIndex, oIndex)}
+                        style={{ ...iconBtnStyle, color: "#f87171" }}
+                      >
+                        <X size={15} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {q.options.length < 4 && (
+                <button
+                  onClick={() => addOption(qIndex)}
+                  style={{
+                    marginTop: "10px",
+                    background: "transparent",
+                    border: "1px dashed rgba(255,255,255,0.2)",
+                    borderRadius: "8px",
+                    padding: "8px 12px",
+                    color: "rgba(255,255,255,0.5)",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <Plus size={15} /> Adicionar alternativa
+                </button>
+              )}
+
+              <label style={{ ...labelStyle, marginTop: "14px" }}>
+                Mensagem apos responder (opcional)
+              </label>
+              <input
+                style={inputStyle}
+                value={q.feedback || ""}
+                onChange={(e) => updateQuestion(qIndex, "feedback", e.target.value)}
+                placeholder="Ex.: Essa era facil, era nossa musica!"
+              />
+            </div>
+          ))}
+
+          <button
+            onClick={addQuestion}
+            style={{
+              width: "100%",
+              padding: "14px",
+              borderRadius: "12px",
+              border: "2px dashed rgba(255,255,255,0.15)",
+              background: "transparent",
+              color: "rgba(255,255,255,0.5)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            <Plus size={18} /> Adicionar Pergunta
+          </button>
+        </>
+      )}
+    </div>
+  )
+
   const renderEstiloTab = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div style={cardStyle}>
@@ -1475,6 +1745,7 @@ export default function GiftEditPage() {
       case "historia": return renderHistoriaTab()
       case "timeline": return renderTimelineTab()
       case "citacoes": return renderCitacoesTab()
+      case "quiz": return renderQuizTab()
       case "estilo": return renderEstiloTab()
       case "preview": return renderPreviewTab()
       default: return null
