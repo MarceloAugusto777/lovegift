@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Star, Sparkles } from 'lucide-react'
+import { X, Star, Check } from 'lucide-react'
 
 interface ConstellationViewerProps {
   photos: string[]
@@ -27,14 +27,22 @@ interface Flyer {
   toY: number
 }
 
+function heartX(t: number) {
+  return 16 * Math.pow(Math.sin(t), 3)
+}
+
+function heartY(t: number) {
+  return 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
+}
+
 function heartPoints(count: number): HeartPoint[] {
   const pts: HeartPoint[] = []
   for (let i = 0; i < count; i++) {
     const t = (i / count) * Math.PI * 2
-    const x = 16 * Math.pow(Math.sin(t), 3)
-    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
+    const x = heartX(t)
+    const y = heartY(t)
     const left = 50 + (x / 16) * 44
-    const top = 50 + (y / 17) * 40
+    const top = 12 + ((y + 17) / 22) * 46
     pts.push({ left, top })
   }
   return pts
@@ -104,16 +112,15 @@ export default function ConstellationViewer({
 
     setPlaced((prev) => prev.map((v, i) => (i === index ? true : v)))
     setFlash(index)
-    setTimeout(() => setFlash(null), 500)
+    setTimeout(() => setFlash(null), 600)
     const id = flyerId.current++
     setFlyers((prev) => [...prev, { id, fromX: cx, fromY: cy, toX: tx, toY: ty }])
   }
 
   const placedCount = placed.filter(Boolean).length
 
-  const polylinePoints = points
-    .map((p) => `${(p.left / 100) * size.w},${(p.top / 100) * size.h}`)
-    .join(' ')
+  const px = (p: HeartPoint) => ({ x: (p.left / 100) * size.w, y: (p.top / 100) * size.h })
+  const polylinePoints = points.map((p) => `${px(p).x},${px(p).y}`).join(' ')
 
   return (
     <motion.div
@@ -123,8 +130,8 @@ export default function ConstellationViewer({
       transition={{ duration: 0.35 }}
       className="fixed inset-0 z-[90] overflow-hidden"
       style={{
-        background: 'radial-gradient(circle at 50% 20%, #221040 0%, #12081f 55%, #0a0414 100%)',
-        fontFamily: fontFamily ? `'${fontFamily}', serif` : 'serif',
+        background: 'radial-gradient(circle at 50% 22%, #241244 0%, #130a20 55%, #0a0414 100%)',
+        fontFamily: fontFamily && fontFamily !== 'serif' ? `'${fontFamily}', serif` : 'serif',
       }}
     >
       <button
@@ -145,175 +152,155 @@ export default function ConstellationViewer({
       <div className="absolute top-5 left-5 right-16 z-10 flex items-start gap-3">
         <Star size={20} color={accentColor} style={{ marginTop: 3 }} />
         <div>
-          <h2 className="text-white text-xl font-serif">
-            {title || 'Constelação do Amor'}
-          </h2>
+          <h2 className="text-white text-xl font-serif">{title || 'Constelação do Amor'}</h2>
           <p className="text-white/40 text-xs mt-1 leading-relaxed">
             {allPlaced
               ? 'Sua constelação está completa ✨'
-              : `Toque em cada momento para acendê-lo no céu ${placedCount}/${photosToUse.length}`}
+              : `Toque nos momentos abaixo e acenda cada estrela ${placedCount}/${photosToUse.length}`}
           </p>
         </div>
       </div>
 
-      <div
-        ref={skyRef}
-        className="absolute inset-0 overflow-hidden"
-        style={{ touchAction: 'manipulation' }}
-      >
+      <div ref={skyRef} className="absolute inset-0 overflow-hidden" style={{ touchAction: 'manipulation' }}>
         {/* ambient stars */}
-        {Array.from({ length: 60 }, (_, i) => (
+        {Array.from({ length: 50 }, (_, i) => (
           <span
             key={i}
             className="absolute rounded-full twinkle"
             style={{
-              width: 2 + (i % 3),
-              height: 2 + (i % 3),
+              width: 1 + (i % 3),
+              height: 1 + (i % 3),
               left: `${(i * 37) % 100}%`,
-              top: `${(i * 53) % 100}%`,
-              background: i % 4 === 0 ? accentColor : 'rgba(255,255,255,0.6)',
-              animationDelay: `${(i % 10) * 0.35}s`,
+              top: `${(i * 53) % 97}%`,
+              background: i % 4 === 0 ? accentColor : 'rgba(255,255,255,0.55)',
+              animationDelay: `${(i % 10) * 0.4}s`,
             }}
           />
         ))}
 
-        {/* constellation lines */}
-        {size.w > 0 && (
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ opacity: allPlaced ? 1 : 0, transition: 'opacity 1s' }}
+        {/* heart guide */}
+        {size.w > 0 && points.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9 }}
+            className="absolute inset-0"
           >
-            <polyline
-              points={polylinePoints}
-              fill="none"
-              stroke={accentColor}
-              strokeWidth={1.5}
-              strokeOpacity={0.7}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{
-                strokeDasharray: '1600',
-                strokeDashoffset: allPlaced ? 0 : 1600,
-                transition: 'stroke-dashoffset 2.4s ease',
-                filter: `drop-shadow(0 0 6px ${accentColor})`,
-              }}
-            />
-          </svg>
+            <svg className="absolute inset-0 w-full h-full pointer-events-none">
+              <polyline
+                points={polylinePoints}
+                fill="none"
+                stroke={accentColor}
+                strokeWidth={1.2}
+                strokeOpacity={allPlaced ? 0.9 : 0.35}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  strokeDasharray: allPlaced ? 'none' : '5 9',
+                  strokeDashoffset: allPlaced ? 0 : 1600,
+                  transition: 'stroke-dashoffset 2.2s ease, stroke-opacity 0.6s',
+                  filter: `drop-shadow(0 0 8px ${accentColor}aa)`,
+                }}
+              />
+              {points.map((p, i) => (
+                <circle
+                  key={i}
+                  cx={px(p).x}
+                  cy={px(p).y}
+                  r={7}
+                  fill={placed[i] ? accentColor : 'transparent'}
+                  stroke={placed[i] ? accentColor : `${accentColor}66`}
+                  strokeWidth={1}
+                  strokeOpacity={0.5}
+                  style={{
+                    filter: placed[i] ? `drop-shadow(0 0 8px ${accentColor})` : 'none',
+                    transition: 'fill 0.4s, filter 0.4s',
+                  }}
+                />
+              ))}
+            </svg>
+          </motion.div>
         )}
 
-        {/* stars (placed photos) */}
+        {/* placed stars */}
         {points.map((p, i) =>
           placed[i] ? (
             <motion.div
               key={`star-${i}`}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 16 }}
-              className="absolute rounded-full overflow-hidden"
+              transition={{ type: 'spring', stiffness: 280, damping: 17 }}
+              className="absolute rounded-full overflow-hidden star-pulse"
               style={{
                 left: p.left,
                 top: p.top,
-                width: 26,
-                height: 26,
-                marginLeft: -13,
-                marginTop: -13,
-                boxShadow: `0 0 18px 4px ${accentColor}aa, inset 0 0 0 2px ${accentColor}66`,
+                width: 30,
+                height: 30,
+                marginLeft: -15,
+                marginTop: -15,
+                boxShadow: `0 0 20px 5px ${accentColor}99, inset 0 0 0 2px ${accentColor}88`,
                 zIndex: 5,
               }}
             >
-              <img src={photosToUse[i]} alt={`Estrela ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img
+                src={photosToUse[i]}
+                alt={`Estrela ${i + 1}`}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
             </motion.div>
           ) : null
         )}
 
-        {/* scatter cards */}
-        {!allPlaced && (
-          <div className="absolute inset-x-0 top-[24%] bottom-0 flex flex-wrap justify-center content-start gap-3 px-6 pt-4 overflow-y-auto">
-            {photosToUse.map((photo, i) =>
-              placed[i] ? null : (
-                <motion.button
-                  id={`const-card-${i}`}
-                  key={i}
-                  onClick={() => ignite(i)}
-                  whileHover={{ scale: 1.06, y: -3 }}
-                  whileTap={{ scale: 0.94 }}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.06 * i }}
-                  className="const-card cursor-pointer select-none"
-                  style={{
-                    width: 88,
-                    background: '#fff',
-                    borderRadius: 8,
-                    padding: 6,
-                    boxShadow: '0 6px 18px rgba(0,0,0,0.4)',
-                    border: 'none',
-                    position: 'relative',
-                  }}
-                >
-                  <img
-                    src={photo}
-                    alt={`Momento ${i + 1}`}
-                    style={{ width: '100%', height: 66, objectFit: 'cover', borderRadius: 4, display: 'block' }}
-                  />
-                  <span className="block text-center mt-1" style={{ fontSize: 9, color: '#8a6a2f', fontWeight: 600 }}>
-                    {coupleName || 'momento'}
-                  </span>
-                </motion.button>
-              )
-            )}
-          </div>
-        )}
-
         {/* flash on ignite */}
-        {flash !== null && placed[flash] && (
-          <motion.div
-            initial={{ opacity: 1, scale: 0.4 }}
-            animate={{ opacity: 0, scale: 2.4 }}
-            transition={{ duration: 0.5 }}
-            className="pointer-events-none absolute rounded-full"
-            style={{
-              left: points[flash].left,
-              top: points[flash].top,
-              width: 80,
-              height: 80,
-              marginLeft: -40,
-              marginTop: -40,
-              background: `radial-gradient(circle, ${accentColor}cc 0%, transparent 70%)`,
-              zIndex: 6,
-            }}
-          />
-        )}
+        <AnimatePresence>
+          {flash !== null && placed[flash] && (
+            <motion.div
+              initial={{ opacity: 0.9, scale: 0.4 }}
+              animate={{ opacity: 0, scale: 2.6 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+              className="pointer-events-none absolute rounded-full"
+              style={{
+                left: points[flash].left,
+                top: points[flash].top,
+                width: 110,
+                height: 110,
+                marginLeft: -55,
+                marginTop: -55,
+                background: `radial-gradient(circle, ${accentColor}dd 0%, transparent 68%)`,
+                zIndex: 6,
+              }}
+            />
+          )}
+        </AnimatePresence>
 
         {/* completion content */}
         {allPlaced && (
-          <div className="absolute inset-x-0 bottom-0 pb-12 px-6 text-center z-10">
+          <div className="absolute inset-x-0 top-[62%] px-6 text-center z-10 pointer-events-none">
             <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.5 }}
               className="text-white text-xl md:text-2xl font-serif mb-2"
             >
               {coupleName ? `${coupleName}, essa constelação é nossa` : 'Essa constelação é nossa'}
             </motion.p>
-            {(message?.trim() || true) && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-                className="text-white/50 text-sm max-w-md mx-auto mb-6 leading-relaxed"
-              >
-                {message?.trim() || 'Cada estrela acesa é um momento nosso que brilha para sempre no céu.'}
-              </motion.p>
-            )}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="text-white/50 text-sm max-w-md mx-auto mb-6 leading-relaxed"
+            >
+              {message?.trim() || 'Cada estrela acesa é um momento nosso que brilha para sempre no céu.'}
+            </motion.p>
             <motion.button
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.3 }}
+              transition={{ delay: 1.2 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.94 }}
               onClick={onClose}
-              className="px-10 py-3.5 rounded-full text-sm font-bold text-white shadow-2xl"
+              className="px-10 py-3.5 rounded-full text-sm font-bold text-white shadow-2xl cursor-pointer pointer-events-auto"
               style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}bb)` }}
             >
               Continuar ❤
@@ -322,33 +309,103 @@ export default function ConstellationViewer({
         )}
       </div>
 
+      {/* photo strip */}
+      {!allPlaced && photosToUse.length > 0 && (
+        <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-5">
+          <div className="flex gap-2.5 overflow-x-auto pb-1 constellation-strip">
+            {photosToUse.map((photo, i) => (
+              <motion.button
+                id={`const-card-${i}`}
+                key={i}
+                onClick={() => ignite(i)}
+                whileHover={{ scale: placed[i] ? 1 : 1.08, y: placed[i] ? 0 : -3 }}
+                whileTap={{ scale: 0.9 }}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 * i }}
+                className="relative flex-none cursor-pointer select-none overflow-hidden rounded-xl"
+                style={{
+                  width: 66,
+                  height: 66,
+                  border: placed[i] ? '2px solid rgba(255,255,255,0.2)' : `2px solid ${accentColor}55`,
+                  opacity: placed[i] ? 0.35 : 1,
+                  boxShadow: placed[i] ? 'none' : '0 8px 22px rgba(0,0,0,0.5)',
+                }}
+              >
+                <img
+                  src={photo}
+                  alt={`Momento ${i + 1}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+                {placed[i] ? (
+                  <span
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ background: 'rgba(0,0,0,0.55)' }}
+                  >
+                    <Check size={22} color={accentColor} />
+                  </span>
+                ) : (
+                  <span
+                    className="absolute top-1 left-1 rounded-full flex items-center justify-center"
+                    style={{
+                      width: 18,
+                      height: 18,
+                      background: accentColor,
+                      color: '#fff',
+                      fontSize: 10,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                )}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* flyers */}
       {flyers.map((f) => (
         <motion.div
           key={f.id}
-          initial={{ opacity: 1, x: f.fromX, y: f.fromY, scale: 0.8 }}
+          initial={{ opacity: 1, x: f.fromX, y: f.fromY, scale: 0.9 }}
           animate={{ opacity: [1, 1, 0], x: f.toX, y: f.toY, scale: 0.3 }}
           transition={{ duration: 0.65, ease: 'easeIn' }}
           onAnimationComplete={() => setFlyers((prev) => prev.filter((x) => x.id !== f.id))}
           className="fixed z-[95] pointer-events-none rounded-full"
           style={{
-            width: 14,
-            height: 14,
-            marginLeft: -7,
-            marginTop: -7,
+            width: 12,
+            height: 12,
+            marginLeft: -6,
+            marginTop: -6,
             background: accentColor,
-            boxShadow: `0 0 16px 4px ${accentColor}`,
+            boxShadow: `0 0 18px 5px ${accentColor}`,
           }}
         />
       ))}
 
       <style>{`
         .twinkle {
-          animation: twinkle 2.4s ease-in-out infinite;
+          animation: twinkle 2.6s ease-in-out infinite;
         }
         @keyframes twinkle {
-          0%, 100% { opacity: 0.15; transform: scale(0.8); }
-          50% { opacity: 0.9; transform: scale(1.25); }
+          0%, 100% { opacity: 0.12; transform: scale(0.8); }
+          50% { opacity: 0.85; transform: scale(1.3); }
+        }
+        .star-pulse {
+          animation: starPulse 2.2s ease-in-out infinite;
+        }
+        @keyframes starPulse {
+          0%, 100% { box-shadow: 0 0 14px 3px ${accentColor}77, inset 0 0 0 2px ${accentColor}88; }
+          50% { box-shadow: 0 0 26px 8px ${accentColor}bb, inset 0 0 0 2px ${accentColor}aa; }
+        }
+        .constellation-strip {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .constellation-strip::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </motion.div>
