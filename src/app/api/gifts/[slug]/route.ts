@@ -55,6 +55,14 @@ export async function PUT(
     if (body.surprisePhoto !== undefined) updateData.surprisePhoto = body.surprisePhoto
     if (body.welcomeEnabled !== undefined) updateData.welcomeEnabled = body.welcomeEnabled
     if (body.welcomeMessage !== undefined) updateData.welcomeMessage = body.welcomeMessage
+    if (body.introStyle !== undefined) updateData.introStyle = body.introStyle
+    if (body.miniGameEnabled !== undefined) updateData.miniGameEnabled = body.miniGameEnabled
+    if (body.miniGameDuration !== undefined) updateData.miniGameDuration = body.miniGameDuration
+    if (body.miniGameTarget !== undefined) updateData.miniGameTarget = body.miniGameTarget
+    if (body.miniGameMessage !== undefined) updateData.miniGameMessage = body.miniGameMessage
+    if (body.polaroidEnabled !== undefined) updateData.polaroidEnabled = body.polaroidEnabled
+    if (body.polaroidTitle !== undefined) updateData.polaroidTitle = body.polaroidTitle
+    if (body.polaroidMessage !== undefined) updateData.polaroidMessage = body.polaroidMessage
     if (body.templateId !== undefined) {
       const template = await prisma.template.findUnique({ where: { slug: body.templateId } })
       if (template) updateData.templateId = template.id

@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { templates, type TemplateId } from '@/components/templates'
 import MusicPlayer from '@/components/music-player'
-import IntroScreen from '@/components/intro-screen'
+import IntroRouter from '@/components/intros'
+import ExperiencesHub from '@/components/experiences/experiences-hub'
 
 interface GiftData {
   coupleName: string
@@ -33,6 +34,14 @@ interface GiftData {
   surprisePhoto: string
   welcomeEnabled: boolean
   welcomeMessage: string
+  introStyle?: string
+  miniGameEnabled: boolean
+  miniGameDuration: number
+  miniGameTarget: number
+  miniGameMessage: string
+  polaroidEnabled: boolean
+  polaroidTitle: string
+  polaroidMessage: string
   templateId: string
   senderName?: string
   clientName?: string
@@ -130,7 +139,8 @@ export default function GiftPage() {
 
       <AnimatePresence>
         {gift.welcomeEnabled && !introDone && (
-          <IntroScreen
+          <IntroRouter
+            style={gift.introStyle || 'envelope'}
             senderName={gift.senderName}
             welcomeMessage={gift.welcomeMessage}
             coupleName={gift.coupleName}
@@ -147,6 +157,21 @@ export default function GiftPage() {
         transition={{ duration: gift.welcomeEnabled ? 0.5 : 0 }}
       >
         <TemplateComponent gift={gift} />
+        <ExperiencesHub
+          gift={{
+            coupleName: gift.coupleName,
+            accentColor: gift.accentColor,
+            fontFamily: gift.fontFamily,
+            photos: gift.photos,
+            miniGameEnabled: !!gift.miniGameEnabled,
+            miniGameDuration: gift.miniGameDuration || 20,
+            miniGameTarget: gift.miniGameTarget || 12,
+            miniGameMessage: gift.miniGameMessage || '',
+            polaroidEnabled: !!gift.polaroidEnabled,
+            polaroidTitle: gift.polaroidTitle || '',
+            polaroidMessage: gift.polaroidMessage || '',
+          }}
+        />
       </motion.div>
     </main>
   )

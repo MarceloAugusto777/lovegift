@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import ImageCropper from "@/components/image-cropper"
+import { INTRO_STYLES } from "@/components/intros"
 import {
   ArrowLeft,
   Save,
@@ -33,6 +34,8 @@ import {
   ListChecks,
   Check,
   Gift,
+  Gamepad2,
+  Camera,
 } from "lucide-react"
 
 interface StorySection {
@@ -90,10 +93,18 @@ interface GiftData {
   surprisePhoto: string
   welcomeEnabled: boolean
   welcomeMessage: string
+  introStyle: string
+  miniGameEnabled: boolean
+  miniGameDuration: number
+  miniGameTarget: number
+  miniGameMessage: string
+  polaroidEnabled: boolean
+  polaroidTitle: string
+  polaroidMessage: string
   template?: { slug: string; name: string }
 }
 
-type TabId = "info" | "fotos" | "historia" | "timeline" | "citacoes" | "quiz" | "surpresa" | "estilo" | "preview"
+type TabId = "info" | "fotos" | "historia" | "timeline" | "citacoes" | "quiz" | "surpresa" | "experiencias" | "estilo" | "preview"
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "info", label: "Info", icon: <Type size={18} /> },
@@ -103,6 +114,7 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "citacoes", label: "Citacoes", icon: <Quote size={18} /> },
   { id: "quiz", label: "Quiz", icon: <ListChecks size={18} /> },
   { id: "surpresa", label: "Surpresa", icon: <Gift size={18} /> },
+  { id: "experiencias", label: "Experiencias", icon: <Gamepad2 size={18} /> },
   { id: "estilo", label: "Estilo", icon: <Palette size={18} /> },
   { id: "preview", label: "Preview", icon: <Eye size={18} /> },
 ]
@@ -190,6 +202,14 @@ export default function GiftEditPage() {
   const [surprisePhoto, setSurprisePhoto] = useState("")
   const [welcomeEnabled, setWelcomeEnabled] = useState(false)
   const [welcomeMessage, setWelcomeMessage] = useState("")
+  const [introStyle, setIntroStyle] = useState("envelope")
+  const [miniGameEnabled, setMiniGameEnabled] = useState(false)
+  const [miniGameDuration, setMiniGameDuration] = useState(20)
+  const [miniGameTarget, setMiniGameTarget] = useState(12)
+  const [miniGameMessage, setMiniGameMessage] = useState("")
+  const [polaroidEnabled, setPolaroidEnabled] = useState(false)
+  const [polaroidTitle, setPolaroidTitle] = useState("")
+  const [polaroidMessage, setPolaroidMessage] = useState("")
 
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | { type: 'surprise' } | null>(null)
@@ -260,6 +280,14 @@ export default function GiftEditPage() {
       setSurprisePhoto(g.surprisePhoto || "")
       setWelcomeEnabled(!!g.welcomeEnabled)
       setWelcomeMessage(g.welcomeMessage || "")
+      setIntroStyle(g.introStyle || "envelope")
+      setMiniGameEnabled(!!g.miniGameEnabled)
+      setMiniGameDuration(g.miniGameDuration ?? 20)
+      setMiniGameTarget(g.miniGameTarget ?? 12)
+      setMiniGameMessage(g.miniGameMessage || "")
+      setPolaroidEnabled(!!g.polaroidEnabled)
+      setPolaroidTitle(g.polaroidTitle || "")
+      setPolaroidMessage(g.polaroidMessage || "")
 
       try {
         setPhotos(typeof g.photos === "string" ? JSON.parse(g.photos) : g.photos || [])
@@ -313,6 +341,14 @@ export default function GiftEditPage() {
         surprisePhoto,
         welcomeEnabled,
         welcomeMessage,
+        introStyle,
+        miniGameEnabled,
+        miniGameDuration,
+        miniGameTarget,
+        miniGameMessage,
+        polaroidEnabled,
+        polaroidTitle,
+        polaroidMessage,
       }
       const res = await fetch(`/api/gifts/${slug}`, {
         method: "PUT",
@@ -777,18 +813,56 @@ export default function GiftEditPage() {
           Ativar tela de abertura
         </label>
         {welcomeEnabled && (
-          <div style={{ marginTop: "14px" }}>
-            <label style={labelStyle}>Mensagem (opcional)</label>
-            <input
-              style={inputStyle}
-              value={welcomeMessage}
-              onChange={(e) => { setWelcomeMessage(e.target.value); markChanged() }}
-              placeholder="Olha o que Fulano preparou para voce"
-            />
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", marginTop: "6px", lineHeight: "1.4" }}>
-              Deixe vazio para usar o nome do remetente automaticamente.
-            </p>
-          </div>
+          <>
+            <div style={{ marginTop: "16px", marginBottom: "16px" }}>
+              <label style={labelStyle}>Estilo da abertura</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                {INTRO_STYLES.map((s) => (
+                  <button
+                    key={s.value}
+                    onClick={() => { setIntroStyle(s.value); markChanged() }}
+                    style={{
+                      padding: "12px",
+                      borderRadius: "12px",
+                      border: introStyle === s.value
+                        ? `2px solid ${accentColor}`
+                        : "2px solid rgba(255,255,255,0.08)",
+                      background: introStyle === s.value
+                        ? `${accentColor}15`
+                        : "rgba(255,255,255,0.03)",
+                      color: "#fff",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.2s",
+                      display: "flex",
+                      gap: "10px",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ fontSize: "22px", lineHeight: 1 }}>{s.emoji}</span>
+                    <span>
+                      <span style={{ display: "block", fontSize: "13px", fontWeight: "600" }}>{s.label}</span>
+                      <span style={{ display: "block", fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
+                        {s.desc}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Mensagem (opcional)</label>
+              <input
+                style={inputStyle}
+                value={welcomeMessage}
+                onChange={(e) => { setWelcomeMessage(e.target.value); markChanged() }}
+                placeholder="Olha o que Fulano preparou para voce"
+              />
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", marginTop: "6px", lineHeight: "1.4" }}>
+                Deixe vazio para usar o nome do remetente automaticamente.
+              </p>
+            </div>
+          </>
         )}
       </div>
 
@@ -1784,6 +1858,116 @@ export default function GiftEditPage() {
     </div>
   )
 
+  const renderExperienciasTab = () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+          <Gamepad2 size={18} color={accentColor} />
+          <h3 style={{ color: "#fff", margin: 0, fontSize: "16px" }}>Jogo do Amor</h3>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 16px", lineHeight: 1.6 }}>
+          Um mini-game em tela cheia no fim do presente: quem recebe pega corações caindo
+          antes do tempo acabar. Aparece como um "capitulo" separado, fora da pagina de rolagem.
+        </p>
+        <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={miniGameEnabled}
+            onChange={(e) => { setMiniGameEnabled(e.target.checked); markChanged() }}
+            style={{ width: "18px", height: "18px", accentColor }}
+          />
+          Ativar o Jogo do Amor
+        </label>
+        {miniGameEnabled && (
+          <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div>
+                <label style={labelStyle}>Duracao (segundos)</label>
+                <input
+                  style={inputStyle}
+                  type="number"
+                  min={5}
+                  max={60}
+                  value={miniGameDuration}
+                  onChange={(e) => { setMiniGameDuration(Number(e.target.value) || 20); markChanged() }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Coracoes para pegar</label>
+                <input
+                  style={inputStyle}
+                  type="number"
+                  min={1}
+                  max={60}
+                  value={miniGameTarget}
+                  onChange={(e) => { setMiniGameTarget(Number(e.target.value) || 12); markChanged() }}
+                />
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Mensagem final (opcional)</label>
+              <textarea
+                style={{ ...inputStyle, minHeight: "70px", resize: "vertical" }}
+                value={miniGameMessage}
+                onChange={(e) => { setMiniGameMessage(e.target.value); markChanged() }}
+                placeholder="Ex.: Cada coracao que voce pegou e um motivo pra eu te amar..."
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+          <Camera size={18} color={accentColor} />
+          <h3 style={{ color: "#fff", margin: 0, fontSize: "16px" }}>Momentos Polaroid</h3>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 16px", lineHeight: 1.6 }}>
+          As fotos da aba <strong style={{ color: "#fff" }}>Fotos</strong> caem como polaroids
+          em tela cheia. Toque em cada uma para reviver o momento por completo.
+        </p>
+        <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={polaroidEnabled}
+            onChange={(e) => { setPolaroidEnabled(e.target.checked); markChanged() }}
+            style={{ width: "18px", height: "18px", accentColor }}
+          />
+          Ativar Momentos Polaroid
+        </label>
+        {polaroidEnabled && (
+          <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div>
+              <label style={labelStyle}>Titulo (opcional)</label>
+              <input
+                style={inputStyle}
+                value={polaroidTitle}
+                onChange={(e) => { setPolaroidTitle(e.target.value); markChanged() }}
+                placeholder="Ex.: Nossa História em Polaroid"
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Mensagem (opcional)</label>
+              <textarea
+                style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }}
+                value={polaroidMessage}
+                onChange={(e) => { setPolaroidMessage(e.target.value); markChanged() }}
+                placeholder="Ex.: Toque nas fotos e relembre cada momento nosso..."
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={cardStyle}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", margin: 0, lineHeight: "1.6" }}>
+          💡 As experiencias ativadas aparecem juntas na pagina final do presente, em um hub de
+          "capitulos" em tela cheia — nada fica empilhado na pagina de rolagem.
+        </p>
+      </div>
+    </div>
+  )
+
   const renderEstiloTab = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div style={cardStyle}>
@@ -1973,6 +2157,7 @@ export default function GiftEditPage() {
       case "citacoes": return renderCitacoesTab()
       case "quiz": return renderQuizTab()
       case "surpresa": return renderSurpresaTab()
+      case "experiencias": return renderExperienciasTab()
       case "estilo": return renderEstiloTab()
       case "preview": return renderPreviewTab()
       default: return null

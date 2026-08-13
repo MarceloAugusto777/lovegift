@@ -55,6 +55,16 @@ model Gift {
   
   welcomeEnabled  Boolean @default(false)
   welcomeMessage  String  @default("")
+  introStyle      String  @default("envelope")
+  
+  miniGameEnabled  Boolean @default(false)
+  miniGameDuration Int     @default(20)
+  miniGameTarget   Int     @default(12)
+  miniGameMessage  String  @default("")
+  
+  polaroidEnabled Boolean @default(false)
+  polaroidTitle   String  @default("")
+  polaroidMessage String  @default("")
   
   senderName    String?
   clientName    String?

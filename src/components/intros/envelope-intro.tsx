@@ -3,24 +3,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Heart, Sparkles } from 'lucide-react'
+import type { IntroProps } from './types'
+import { getIntroMessage } from './types'
 
-interface IntroScreenProps {
-  senderName?: string
-  welcomeMessage?: string
-  coupleName?: string
-  accentColor: string
-  fontFamily?: string
-  onOpen: () => void
-}
-
-export default function IntroScreen({
+export default function EnvelopeIntro({
   senderName,
   welcomeMessage,
   coupleName,
   accentColor,
   fontFamily,
   onOpen,
-}: IntroScreenProps) {
+}: IntroProps) {
   const [opened, setOpened] = useState(false)
 
   useEffect(() => {
@@ -30,11 +23,7 @@ export default function IntroScreen({
     }
   }, [])
 
-  const message = welcomeMessage?.trim()
-    ? welcomeMessage
-    : senderName?.trim()
-      ? `Olha o que ${senderName} preparou para você`
-      : 'Um presente muito especial preparado com carinho para você'
+  const message = getIntroMessage(senderName, welcomeMessage)
 
   const hearts = useMemo(
     () =>
@@ -78,7 +67,8 @@ export default function IntroScreen({
         }}
       />
 
-      <div className="pointer-events-none absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full opacity-30 blur-[100px]"
+      <div
+        className="pointer-events-none absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full opacity-30 blur-[100px]"
         style={{ background: accentColor }}
       />
 
