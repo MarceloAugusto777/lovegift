@@ -42,7 +42,7 @@ function heartPoints(count: number): HeartPoint[] {
     const x = heartX(t)
     const y = heartY(t)
     const left = 50 + (x / 16) * 44
-    const top = 12 + ((y + 17) / 22) * 46
+    const top = 10 + ((11.5 - y) / 28.5) * 50
     pts.push({ left, top })
   }
   return pts
