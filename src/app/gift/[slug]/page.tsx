@@ -163,6 +163,8 @@ export default function GiftPage() {
             accentColor: gift.accentColor,
             fontFamily: gift.fontFamily,
             photos: gift.photos,
+            storySections: gift.storySections,
+            timelineEvents: gift.timelineEvents,
             miniGameEnabled: !!gift.miniGameEnabled,
             miniGameDuration: gift.miniGameDuration || 20,
             miniGameTarget: gift.miniGameTarget || 12,

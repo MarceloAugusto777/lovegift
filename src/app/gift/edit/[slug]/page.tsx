@@ -1923,8 +1923,9 @@ export default function GiftEditPage() {
           <h3 style={{ color: "#fff", margin: 0, fontSize: "16px" }}>Momentos Polaroid</h3>
         </div>
         <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 16px", lineHeight: 1.6 }}>
-          As fotos da aba <strong style={{ color: "#fff" }}>Fotos</strong> caem como polaroids
-          em tela cheia. Toque em cada uma para reviver o momento por completo.
+          Todas as fotos do presente (abas <strong style={{ color: "#fff" }}>Fotos</strong>,{" "}
+          <strong style={{ color: "#fff" }}>Historia</strong> e <strong style={{ color: "#fff" }}>Timeline</strong>)
+          caem como polaroids em tela cheia. Toque em cada uma para reviver o momento por completo.
         </p>
         <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
           <input

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, X, RotateCcw, Trophy } from 'lucide-react'
 
@@ -24,6 +24,12 @@ interface FallingHeart {
   drift: number
 }
 
+interface Popup {
+  id: number
+  x: number
+  y: number
+}
+
 type Phase = 'intro' | 'playing' | 'done'
 
 export default function HeartCatchGame({
@@ -39,6 +45,7 @@ export default function HeartCatchGame({
   const [hearts, setHearts] = useState<FallingHeart[]>([])
   const [score, setScore] = useState(0)
   const [timeLeft, setTimeLeft] = useState(durationSec)
+  const [popups, setPopups] = useState<Popup[]>([])
   const [won, setWon] = useState(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -46,72 +53,85 @@ export default function HeartCatchGame({
   const scoreRef = useRef(0)
   const timeLeftRef = useRef(durationSec)
   const rafRef = useRef(0)
-  const spawnRef = useRef(0)
+  const frameRef = useRef(0)
   const endRef = useRef(0)
   const idRef = useRef(0)
+  const popupIdRef = useRef(0)
   const phaseRef = useRef<Phase>('intro')
 
   const startGame = () => {
     phaseRef.current = 'playing'
-    setPhase('playing')
     heartsRef.current = []
     scoreRef.current = 0
     timeLeftRef.current = durationSec
     endRef.current = Date.now() + durationSec * 1000
-    spawnRef.current = 0
+    frameRef.current = 0
     idRef.current = 0
+    popupIdRef.current = 0
     setHearts([])
     setScore(0)
     setTimeLeft(durationSec)
+    setPopups([])
     setWon(false)
+    setPhase('playing')
   }
 
-  const finish = useCallback(
-    (win: boolean) => {
-      phaseRef.current = 'done'
-      setWon(win)
-      setPhase('done')
-    },
-    []
-  )
+  const finish = useCallback((win: boolean) => {
+    phaseRef.current = 'done'
+    setWon(win)
+    setPhase('done')
+  }, [])
 
   useEffect(() => {
     if (phase !== 'playing') return
 
-    const step = () => {
-      const container = containerRef.current
-      if (!container) return
-      const w = container.clientWidth
-      const h = container.clientHeight
-      const now = Date.now()
+    const w = window.innerWidth
+    const h = window.innerHeight
 
+    for (let i = 0; i < 4; i++) {
+      heartsRef.current.push({
+        id: idRef.current++,
+        x: Math.random() * (w - 80),
+        y: -60 - Math.random() * 200,
+        speed: 1.2 + Math.random() * 1.4,
+        size: 40 + Math.random() * 22,
+        rot: (Math.random() - 0.5) * 30,
+        drift: (Math.random() - 0.5) * 0.5,
+      })
+    }
+    setHearts([...heartsRef.current])
+
+    const step = () => {
+      frameRef.current += 1
+      const now = Date.now()
       const remaining = Math.max(0, (endRef.current - now) / 1000)
       timeLeftRef.current = remaining
 
-      spawnRef.current -= 1
-      if (spawnRef.current <= 0) {
-        spawnRef.current = 26
-        const size = 34 + Math.random() * 26
+      if (frameRef.current % 24 === 0) {
+        const size = 36 + Math.random() * 22
         heartsRef.current.push({
           id: idRef.current++,
-          x: Math.random() * (w - 60),
+          x: Math.random() * (w - 80),
           y: -60,
-          speed: 1.4 + Math.random() * 2.2,
+          speed: 1.2 + Math.random() * 1.6,
           size,
-          rot: (Math.random() - 0.5) * 40,
-          drift: (Math.random() - 0.5) * 0.6,
+          rot: (Math.random() - 0.5) * 30,
+          drift: (Math.random() - 0.5) * 0.5,
         })
       }
 
       heartsRef.current = heartsRef.current.filter((hrt) => {
-        hrt.y += hrt.speed * 1.6
-        hrt.x += hrt.drift * 1.6
-        hrt.rot += 0.4
-        return hrt.y < h + 80
+        hrt.y += hrt.speed * 1.5
+        hrt.x += hrt.drift * 1.5
+        hrt.rot += 0.5
+        return hrt.y < h + 90
       })
 
-      setHearts([...heartsRef.current])
-      setTimeLeft(remaining)
+      setHearts(heartsRef.current.length ? [...heartsRef.current] : [])
+
+      if (frameRef.current % 10 === 0) {
+        setTimeLeft(remaining)
+      }
 
       if (remaining <= 0) {
         finish(scoreRef.current >= target)
@@ -124,18 +144,31 @@ export default function HeartCatchGame({
     return () => cancelAnimationFrame(rafRef.current)
   }, [phase, finish, target])
 
-  const catchHeart = (id: number) => {
+  const catchHeart = (id: number, e?: SyntheticEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
     if (phaseRef.current !== 'playing') return
+    const heart = heartsRef.current.find((hrt) => hrt.id === id)
+    if (!heart) return
     heartsRef.current = heartsRef.current.filter((hrt) => hrt.id !== id)
-    setHearts([...heartsRef.current])
+    setHearts(heartsRef.current.length ? [...heartsRef.current] : [])
+
     scoreRef.current += 1
     setScore(scoreRef.current)
+    setPopups((prev) => [
+      ...prev,
+      { id: popupIdRef.current++, x: heart.x, y: Math.max(10, heart.y - 20) },
+    ])
+    setTimeout(() => {
+      setPopups((prev) => prev.slice(1))
+    }, 700)
+
     if (scoreRef.current >= target) {
       finish(true)
     }
   }
 
-  const progress = durationSec > 0 ? timeLeft / durationSec : 0
+  const progress = durationSec > 0 ? Math.min(1, timeLeft / durationSec) : 0
 
   return (
     <motion.div
@@ -202,12 +235,16 @@ export default function HeartCatchGame({
           >
             <div className="absolute top-4 left-4 right-16 z-20">
               <div className="flex items-center justify-between gap-4 mb-2">
-                <div className="rounded-full px-4 py-1.5 text-sm font-semibold"
-                  style={{ background: 'rgba(255,255,255,0.12)', color: '#fff' }}>
+                <div
+                  className="rounded-full px-4 py-1.5 text-sm font-semibold"
+                  style={{ background: 'rgba(255,255,255,0.12)', color: '#fff' }}
+                >
                   ❤ {score} / {target}
                 </div>
-                <div className="rounded-full px-4 py-1.5 text-sm font-semibold"
-                  style={{ background: 'rgba(255,255,255,0.12)', color: '#fff' }}>
+                <div
+                  className="rounded-full px-4 py-1.5 text-sm font-semibold"
+                  style={{ background: 'rgba(255,255,255,0.12)', color: '#fff' }}
+                >
                   ⏱ {Math.ceil(timeLeft)}s
                 </div>
               </div>
@@ -222,34 +259,48 @@ export default function HeartCatchGame({
             <div
               ref={containerRef}
               className="absolute inset-0 overflow-hidden"
-              style={{ touchAction: 'none' }}
+              style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
             >
               {hearts.map((hrt) => (
-                <motion.button
+                <button
                   key={hrt.id}
-                  onPointerDown={(e) => {
-                    e.stopPropagation()
-                    catchHeart(hrt.id)
-                  }}
+                  type="button"
+                  onPointerDown={(e) => catchHeart(hrt.id, e)}
+                  onClick={(e) => catchHeart(hrt.id, e)}
                   className="absolute cursor-pointer select-none"
                   style={{
                     left: hrt.x,
                     top: hrt.y,
                     background: 'transparent',
                     border: 'none',
-                    padding: 0,
+                    padding: 8,
+                    transform: `rotate(${hrt.rot}deg)`,
+                    WebkitTapHighlightColor: 'transparent',
                   }}
-                  animate={{ rotate: hrt.rot }}
                 >
                   <Heart
                     size={hrt.size}
                     fill={accentColor}
                     stroke="#fff"
-                    style={{ filter: `drop-shadow(0 3px 8px rgba(0,0,0,0.4))` }}
+                    strokeWidth={1.5}
+                    style={{ filter: `drop-shadow(0 3px 8px rgba(0,0,0,0.45))` }}
                   />
-                </motion.button>
+                </button>
               ))}
             </div>
+
+            {popups.map((p) => (
+              <motion.span
+                key={p.id}
+                initial={{ opacity: 1, scale: 0.6, y: 0 }}
+                animate={{ opacity: 0, scale: 1.3, y: -46 }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
+                className="absolute z-30 font-bold pointer-events-none"
+                style={{ left: p.x, top: p.y, color: '#fff', fontSize: 20, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
+              >
+                +1 💘
+              </motion.span>
+            ))}
           </motion.div>
         )}
 

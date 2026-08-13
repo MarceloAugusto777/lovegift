@@ -11,6 +11,8 @@ export interface ExperiencesHubGift {
   accentColor: string
   fontFamily?: string
   photos: string
+  storySections: string
+  timelineEvents: string
   miniGameEnabled: boolean
   miniGameDuration: number
   miniGameTarget: number
@@ -20,21 +22,49 @@ export interface ExperiencesHubGift {
   polaroidMessage: string
 }
 
+function collectPolaroidPhotos(gift: ExperiencesHubGift): string[] {
+  const all: string[] = []
+  const push = (u?: string) => {
+    if (u && typeof u === 'string' && u.startsWith('data:image') && !all.includes(u)) all.push(u)
+    if (u && typeof u === 'string' && u.startsWith('http') && !all.includes(u)) all.push(u)
+  }
+  try {
+    const gallery = JSON.parse(gift.photos)
+    if (Array.isArray(gallery)) gallery.forEach((p) => push(p))
+  } catch {
+    /* ignore */
+  }
+  try {
+    const sections = JSON.parse(gift.storySections)
+    if (Array.isArray(sections)) {
+      sections.forEach((s: { photo?: string; photos?: string[] }) => {
+        push(s.photo)
+        if (Array.isArray(s.photos)) s.photos.forEach((p) => push(p))
+      })
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    const events = JSON.parse(gift.timelineEvents)
+    if (Array.isArray(events)) {
+      events.forEach((e: { photo?: string }) => push(e.photo))
+    }
+  } catch {
+    /* ignore */
+  }
+  return all
+}
+
 export default function ExperiencesHub({ gift }: { gift: ExperiencesHubGift }) {
   const [active, setActive] = useState<'game' | 'polaroid' | null>(null)
 
   const gameOn = gift.miniGameEnabled
-  const polaroidOn = gift.polaroidEnabled && gift.photos
+  const polaroidOn = gift.polaroidEnabled
 
   if (!gameOn && !polaroidOn) return null
 
-  let photos: string[] = []
-  try {
-    const parsed = JSON.parse(gift.photos)
-    if (Array.isArray(parsed)) photos = parsed.filter((p): p is string => typeof p === 'string')
-  } catch {
-    photos = []
-  }
+  const photos = collectPolaroidPhotos(gift)
 
   const color = gift.accentColor
   const fontFamily = gift.fontFamily || 'serif'
