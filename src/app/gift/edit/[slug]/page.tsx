@@ -32,6 +32,7 @@ import {
   ChevronDown,
   ListChecks,
   Check,
+  Gift,
 } from "lucide-react"
 
 interface StorySection {
@@ -80,10 +81,17 @@ interface GiftData {
   quiz: QuizQuestion[]
   quizEnabled: boolean
   quizFinalMessage: string
+  surpriseEnabled: boolean
+  surpriseQuestion: string
+  surpriseAnswer: string
+  surpriseType: string
+  surpriseTitle: string
+  surpriseText: string
+  surprisePhoto: string
   template?: { slug: string; name: string }
 }
 
-type TabId = "info" | "fotos" | "historia" | "timeline" | "citacoes" | "quiz" | "estilo" | "preview"
+type TabId = "info" | "fotos" | "historia" | "timeline" | "citacoes" | "quiz" | "surpresa" | "estilo" | "preview"
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "info", label: "Info", icon: <Type size={18} /> },
@@ -92,6 +100,7 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "timeline", label: "Timeline", icon: <Clock size={18} /> },
   { id: "citacoes", label: "Citacoes", icon: <Quote size={18} /> },
   { id: "quiz", label: "Quiz", icon: <ListChecks size={18} /> },
+  { id: "surpresa", label: "Surpresa", icon: <Gift size={18} /> },
   { id: "estilo", label: "Estilo", icon: <Palette size={18} /> },
   { id: "preview", label: "Preview", icon: <Eye size={18} /> },
 ]
@@ -170,9 +179,16 @@ export default function GiftEditPage() {
   const [quizEnabled, setQuizEnabled] = useState(false)
   const [quiz, setQuiz] = useState<QuizQuestion[]>([])
   const [quizFinalMessage, setQuizFinalMessage] = useState("")
+  const [surpriseEnabled, setSurpriseEnabled] = useState(false)
+  const [surpriseQuestion, setSurpriseQuestion] = useState("")
+  const [surpriseAnswer, setSurpriseAnswer] = useState("")
+  const [surpriseType, setSurpriseType] = useState("text")
+  const [surpriseTitle, setSurpriseTitle] = useState("")
+  const [surpriseText, setSurpriseText] = useState("")
+  const [surprisePhoto, setSurprisePhoto] = useState("")
 
   const [cropImage, setCropImage] = useState<string | null>(null)
-  const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | null>(null)
+  const [cropTarget, setCropTarget] = useState<{ type: 'gallery' } | { type: 'story'; index: number } | { type: 'timeline'; index: number } | { type: 'surprise' } | null>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -231,6 +247,13 @@ export default function GiftEditPage() {
       try {
         setQuiz(typeof g.quiz === "string" ? JSON.parse(g.quiz) : g.quiz || [])
       } catch { setQuiz([]) }
+      setSurpriseEnabled(!!g.surpriseEnabled)
+      setSurpriseQuestion(g.surpriseQuestion || "")
+      setSurpriseAnswer(g.surpriseAnswer || "")
+      setSurpriseType(g.surpriseType || "text")
+      setSurpriseTitle(g.surpriseTitle || "")
+      setSurpriseText(g.surpriseText || "")
+      setSurprisePhoto(g.surprisePhoto || "")
 
       try {
         setPhotos(typeof g.photos === "string" ? JSON.parse(g.photos) : g.photos || [])
@@ -275,6 +298,13 @@ export default function GiftEditPage() {
         quiz,
         quizEnabled,
         quizFinalMessage,
+        surpriseEnabled,
+        surpriseQuestion,
+        surpriseAnswer,
+        surpriseType,
+        surpriseTitle,
+        surpriseText,
+        surprisePhoto,
       }
       const res = await fetch(`/api/gifts/${slug}`, {
         method: "PUT",
@@ -395,6 +425,8 @@ export default function GiftEditPage() {
       updateStorySection(cropTarget.index, "photo", url)
     } else if (cropTarget?.type === 'timeline') {
       updateTimelineEvent(cropTarget.index, "photo", url)
+    } else if (cropTarget?.type === 'surprise') {
+      setSurprisePhoto(url)
     }
     markChanged()
     setCropImage(null)
@@ -1558,6 +1590,158 @@ export default function GiftEditPage() {
     </div>
   )
 
+  const renderSurpresaTab = () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+          <Gift size={18} color={accentColor} />
+          <h3 style={{ color: "#fff", margin: 0, fontSize: "16px" }}>Surpresa com Senha</h3>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 16px", lineHeight: 1.6 }}>
+          O presenteado responde uma pergunta e, se acertar, desbloqueia a surpresa
+          (uma foto, uma mensagem ou uma brincadeira).
+        </p>
+        <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={surpriseEnabled}
+            onChange={(e) => { setSurpriseEnabled(e.target.checked); markChanged() }}
+            style={{ width: "18px", height: "18px", accentColor }}
+          />
+          Ativar surpresa neste presente
+        </label>
+      </div>
+
+      {surpriseEnabled && (
+        <>
+          <div style={cardStyle}>
+            <div style={{ marginBottom: "14px" }}>
+              <label style={labelStyle}>Pergunta para desbloquear</label>
+              <input
+                style={inputStyle}
+                value={surpriseQuestion}
+                onChange={(e) => { setSurpriseQuestion(e.target.value); markChanged() }}
+                placeholder="Ex.: Qual foi a data do nosso primeiro beijo?"
+              />
+            </div>
+            <div style={{ marginBottom: "14px" }}>
+              <label style={labelStyle}>Resposta (senha)</label>
+              <input
+                style={inputStyle}
+                value={surpriseAnswer}
+                onChange={(e) => { setSurpriseAnswer(e.target.value); markChanged() }}
+                placeholder="Ex.: 14/02/2024"
+              />
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "12px", marginTop: "6px" }}>
+                Comparacao ignora maiusculas, espacos e acentos.
+              </p>
+            </div>
+            <div>
+              <label style={labelStyle}>Tipo de surpresa</label>
+              <select
+                style={inputStyle}
+                value={surpriseType}
+                onChange={(e) => { setSurpriseType(e.target.value); markChanged() }}
+              >
+                <option value="text">Mensagem de texto</option>
+                <option value="photo">Foto</option>
+                <option value="brincadeira">Brincadeira</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={cardStyle}>
+            <div style={{ marginBottom: "14px" }}>
+              <label style={labelStyle}>Titulo da surpresa</label>
+              <input
+                style={inputStyle}
+                value={surpriseTitle}
+                onChange={(e) => { setSurpriseTitle(e.target.value); markChanged() }}
+                placeholder="Ex.: Para a minha princesa"
+              />
+            </div>
+
+            {surpriseType === "photo" ? (
+              <div>
+                <label style={labelStyle}>Foto da surpresa</label>
+                {surprisePhoto && (
+                  <img
+                    src={surprisePhoto}
+                    alt="Surpresa"
+                    style={{
+                      width: "100%",
+                      maxHeight: "260px",
+                      objectFit: "cover",
+                      borderRadius: "12px",
+                      marginBottom: "12px",
+                    }}
+                  />
+                )}
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <label
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      borderRadius: "10px",
+                      border: "2px dashed rgba(255,255,255,0.15)",
+                      color: "rgba(255,255,255,0.5)",
+                      cursor: "pointer",
+                      textAlign: "center",
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <Upload size={18} /> {surprisePhoto ? "Trocar foto" : "Enviar foto"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={async (e) => {
+                        const files = e.target.files
+                        if (!files || !files[0]) return
+                        const dataUrl = await readFileAsDataUrl(files[0])
+                        setCropImage(dataUrl)
+                        setCropTarget({ type: 'surprise' })
+                        e.target.value = ""
+                      }}
+                    />
+                  </label>
+                  {surprisePhoto && (
+                    <button
+                      onClick={() => { setSurprisePhoto(""); markChanged() }}
+                      style={{ ...iconBtnStyle, color: "#f87171" }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label style={labelStyle}>
+                  {surpriseType === "brincadeira" ? "Brincadeira" : "Mensagem da surpresa"}
+                </label>
+                <textarea
+                  style={{ ...inputStyle, minHeight: "110px", resize: "vertical" }}
+                  value={surpriseText}
+                  onChange={(e) => { setSurpriseText(e.target.value); markChanged() }}
+                  placeholder={
+                    surpriseType === "brincadeira"
+                      ? "Ex.: Fui eu que escondi sua chave semana passada! Agora voce me deve um jantar."
+                      : "Escreva a mensagem que aparece ao desbloquear..."
+                  }
+                />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  )
+
   const renderEstiloTab = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div style={cardStyle}>
@@ -1746,6 +1930,7 @@ export default function GiftEditPage() {
       case "timeline": return renderTimelineTab()
       case "citacoes": return renderCitacoesTab()
       case "quiz": return renderQuizTab()
+      case "surpresa": return renderSurpresaTab()
       case "estilo": return renderEstiloTab()
       case "preview": return renderPreviewTab()
       default: return null

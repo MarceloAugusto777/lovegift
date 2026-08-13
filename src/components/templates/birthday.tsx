@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import PhotoDisplay from '@/components/photo-display'
 import QuizSection from '@/components/templates/quiz-section'
+import SurpriseSection from '@/components/templates/surprise-section'
 import { formatLocalDate, parseLocalDate } from '@/lib/utils'
 
 const sectionVariants = {
@@ -70,6 +71,13 @@ interface BirthdayTemplateProps {
     quiz?: string
     quizEnabled?: boolean
     quizFinalMessage?: string
+    surpriseEnabled?: boolean
+    surpriseQuestion?: string
+    surpriseAnswer?: string
+    surpriseType?: string
+    surpriseTitle?: string
+    surpriseText?: string
+    surprisePhoto?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -795,6 +803,18 @@ export default function BirthdayTemplate({ gift }: BirthdayTemplateProps) {
         quiz={gift.quiz || "[]"}
         quizEnabled={!!gift.quizEnabled}
         quizFinalMessage={gift.quizFinalMessage}
+        accentColor={accentColor}
+        fontFamily={fontFamily}
+      />
+
+      <SurpriseSection
+        surpriseEnabled={!!gift.surpriseEnabled}
+        surpriseQuestion={gift.surpriseQuestion}
+        surpriseAnswer={gift.surpriseAnswer}
+        surpriseType={gift.surpriseType}
+        surpriseTitle={gift.surpriseTitle}
+        surpriseText={gift.surpriseText}
+        surprisePhoto={gift.surprisePhoto}
         accentColor={accentColor}
         fontFamily={fontFamily}
       />

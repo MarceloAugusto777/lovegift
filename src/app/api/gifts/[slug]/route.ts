@@ -46,6 +46,13 @@ export async function PUT(
     if (body.quiz !== undefined) updateData.quiz = JSON.stringify(body.quiz)
     if (body.quizEnabled !== undefined) updateData.quizEnabled = body.quizEnabled
     if (body.quizFinalMessage !== undefined) updateData.quizFinalMessage = body.quizFinalMessage
+    if (body.surpriseEnabled !== undefined) updateData.surpriseEnabled = body.surpriseEnabled
+    if (body.surpriseQuestion !== undefined) updateData.surpriseQuestion = body.surpriseQuestion
+    if (body.surpriseAnswer !== undefined) updateData.surpriseAnswer = body.surpriseAnswer
+    if (body.surpriseType !== undefined) updateData.surpriseType = body.surpriseType
+    if (body.surpriseTitle !== undefined) updateData.surpriseTitle = body.surpriseTitle
+    if (body.surpriseText !== undefined) updateData.surpriseText = body.surpriseText
+    if (body.surprisePhoto !== undefined) updateData.surprisePhoto = body.surprisePhoto
     if (body.templateId !== undefined) {
       const template = await prisma.template.findUnique({ where: { slug: body.templateId } })
       if (template) updateData.templateId = template.id

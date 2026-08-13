@@ -6,6 +6,7 @@ import { Heart, Calendar, MapPin, Music, Clock, Sparkles, ChevronDown, BookOpen,
 import { formatLocalDate, parseLocalDate } from '@/lib/utils'
 import PhotoDisplay from '@/components/photo-display'
 import QuizSection from '@/components/templates/quiz-section'
+import SurpriseSection from '@/components/templates/surprise-section'
 
 interface TemplateProps {
   gift: {
@@ -24,6 +25,13 @@ interface TemplateProps {
     quiz?: string
     quizEnabled?: boolean
     quizFinalMessage?: string
+    surpriseEnabled?: boolean
+    surpriseQuestion?: string
+    surpriseAnswer?: string
+    surpriseType?: string
+    surpriseTitle?: string
+    surpriseText?: string
+    surprisePhoto?: string
     senderName?: string
     clientName?: string
     storyTitle?: string
@@ -692,6 +700,18 @@ export default function WeddingTemplate({ gift }: TemplateProps) {
         quiz={gift.quiz || "[]"}
         quizEnabled={!!gift.quizEnabled}
         quizFinalMessage={gift.quizFinalMessage}
+        accentColor={accentColor}
+        fontFamily={fontFamily}
+      />
+
+      <SurpriseSection
+        surpriseEnabled={!!gift.surpriseEnabled}
+        surpriseQuestion={gift.surpriseQuestion}
+        surpriseAnswer={gift.surpriseAnswer}
+        surpriseType={gift.surpriseType}
+        surpriseTitle={gift.surpriseTitle}
+        surpriseText={gift.surpriseText}
+        surprisePhoto={gift.surprisePhoto}
         accentColor={accentColor}
         fontFamily={fontFamily}
       />

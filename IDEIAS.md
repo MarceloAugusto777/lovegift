@@ -19,7 +19,11 @@ Vídeo curto do comprador (ou capa) com maior impacto emocional.
 O presenteado manda o link com frase pré-preenchida ("olha o presente que
 recebi"). Gera divulgação grátis.
 
-## [PENDENTE] 4. Preview bonito no WhatsApp
+## [FECHADA] 4. Surpresa com senha
+O presenteado precisa acertar a resposta de uma pergunta para desbloquear uma
+surpresa (foto, mensagem ou brincadeira). Presenteante configura no editor.
+
+## [PENDENTE] 5. Preview bonito no WhatsApp
 Thumbnail/capa com nome do casal quando o link é compartilhado (meta tags).
 
 ## [PENDENTE] 6. Carta digital com envelope

@@ -23,6 +23,13 @@ interface GiftData {
   quiz: string
   quizEnabled: boolean
   quizFinalMessage: string
+  surpriseEnabled: boolean
+  surpriseQuestion: string
+  surpriseAnswer: string
+  surpriseType: string
+  surpriseTitle: string
+  surpriseText: string
+  surprisePhoto: string
   templateId: string
   senderName?: string
   clientName?: string
