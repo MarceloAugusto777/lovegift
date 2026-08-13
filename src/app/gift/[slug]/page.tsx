@@ -144,7 +144,7 @@ export default function GiftPage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: gift.welcomeEnabled ? 0.9 : 0 }}
+        transition={{ duration: gift.welcomeEnabled ? 0.5 : 0 }}
       >
         <TemplateComponent gift={gift} />
       </motion.div>
